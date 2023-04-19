@@ -195,10 +195,7 @@ Put -h after command to see available optional arguments if any
                 raise ValueError(f"The expected resource file {fil} is missing!")
 
     def _get_platform_args(self):
-        pre_args = []
-        if is_windows():
-            pre_args = ["cmd", "/c"]  # noqa W605
-        return pre_args
+        return ["cmd", "/c"] if is_windows() else []
 
     def deploy(self):
         self.compile()
@@ -378,11 +375,11 @@ Put -h after command to see available optional arguments if any
         )
         script = VENV_CREATION_SCRIPT.format(
             venv_path=venv_path,
-            source="source " if not is_windows() else "",
+            source="" if is_windows() else "source ",
             activator=os.path.join(
                 ROOT_DIR,
                 VENV_NAME,
-                "bin" if not is_windows() else "Scripts",
+                "Scripts" if is_windows() else "bin",
                 "activate",
             ),
             qgis_path_fix=qgis_path_fix if is_windows() else "",
@@ -404,7 +401,7 @@ Put -h after command to see available optional arguments if any
     def run_command(args, d=None, force_show_output=False):
         cmd = " ".join(args)
         if d is not None:
-            cmd = f"cd {d} && " + cmd
+            cmd = f"cd {d} && {cmd}"
         echo(cmd, force=force_show_output)
         pros = subprocess.Popen(
             args,
@@ -427,12 +424,10 @@ Put -h after command to see available optional arguments if any
     @staticmethod
     def cp_parents(target_dir, files):
         """https://stackoverflow.com/a/15340518"""
-        dirs = []
-        for file in files:
-            dirs.append(os.path.dirname(file))
+        dirs = [os.path.dirname(file) for file in files]
         dirs.sort(reverse=True)
         for i in range(len(dirs)):
-            if not dirs[i] + os.sep in dirs[i - 1]:
+            if dirs[i] + os.sep not in dirs[i - 1]:
                 need_dir = os.path.normpath(target_dir + dirs[i])
                 echo("mkdir", need_dir)
                 os.makedirs(need_dir, exist_ok=True)

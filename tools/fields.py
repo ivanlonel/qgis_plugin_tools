@@ -79,7 +79,7 @@ def value_for_widget(widget: Type[QWidget]) -> Union[str, bool, float, int]:
         return widget.isChecked()
     elif isinstance(widget, QgsDateTimeEdit):
         return widget.dateTime().toString("yyyy-MM-dd hh:mm:ss")
-    elif isinstance(widget, QgsSpinBox) or isinstance(widget, QgsDoubleSpinBox):
+    elif isinstance(widget, (QgsSpinBox, QgsDoubleSpinBox)):
         return widget.value()
     else:
         return str(widget.text())

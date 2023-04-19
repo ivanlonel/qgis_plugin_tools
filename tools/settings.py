@@ -114,9 +114,8 @@ def set_project_setting(
     proj = QgsProject.instance()
     if internal:
         return proj.writeEntry(plugin_name(), key, value)
-    else:
-        QgsExpressionContextUtils.setProjectVariable(proj, key, value)
-        return True
+    QgsExpressionContextUtils.setProjectVariable(proj, key, value)
+    return True
 
 
 def parse_value(value: Union[QVariant, str]) -> Union[None, str, bool]:
@@ -127,10 +126,10 @@ def parse_value(value: Union[QVariant, str]) -> Union[None, str, bool]:
     """
     str_value = str(value)
     val: Union[None, str, bool] = str_value
-    if str_value == "NULL":
+    if val == "NULL":
         val = None
-    elif str_value == "true":
-        val = True
-    elif str_value == "false":
+    elif val == "false":
         val = False
+    elif val == "true":
+        val = True
     return val

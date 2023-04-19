@@ -82,12 +82,11 @@ def set_band_based_on_range(layer: QgsRasterLayer, t_range: QgsDateTimeRange) ->
         tprops.isVisibleInTemporalRange(t_range)
         and t_range.begin().isValid()
         and t_range.end().isValid()
-    ):
-        if tprops.mode() == QgsRasterLayerTemporalProperties.ModeFixedTemporalRange:
-            layer_t_range: QgsDateTimeRange = tprops.fixedTemporalRange()
-            start: datetime.datetime = layer_t_range.begin().toPyDateTime()
-            end: datetime.datetime = layer_t_range.end().toPyDateTime()
-            delta = (end - start) / layer.bandCount()
-            band_num = int((t_range.begin().toPyDateTime() - start) / delta) + 1
-            set_raster_renderer_to_singleband(layer, band_num)
+    ) and tprops.mode() == QgsRasterLayerTemporalProperties.ModeFixedTemporalRange:
+        layer_t_range: QgsDateTimeRange = tprops.fixedTemporalRange()
+        start: datetime.datetime = layer_t_range.begin().toPyDateTime()
+        end: datetime.datetime = layer_t_range.end().toPyDateTime()
+        delta = (end - start) / layer.bandCount()
+        band_num = int((t_range.begin().toPyDateTime() - start) / delta) + 1
+        set_raster_renderer_to_singleband(layer, band_num)
     return band_num

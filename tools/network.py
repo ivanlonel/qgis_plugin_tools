@@ -147,7 +147,7 @@ def request_raw(
     :return: bytes of the content and default name of the file or empty string
     """
     if params:
-        url += "?" + urlencode(params)
+        url += f"?{urlencode(params)}"
     LOGGER.debug(url)
     req = QNetworkRequest(QUrl(url))
     # http://osgeo-org.1560.x6.nabble.com/QGIS-Developer-Do-we-have-a-User-Agent-string-for-QGIS-td5360740.html
