@@ -10,8 +10,8 @@ For setting up the logging (usually in main plugin file):
 
 from qgis_plugin_tools.tools.custom_logging import setup_logger
 
-setup_logger(__name__.split('.')[0]) # use the top level name
-setup_logger("your_plugin_package_name") # pass manually as string
+setup_logger(__name__.split(".")[0])  # use the top level name
+setup_logger("your_plugin_package_name")  # pass manually as string
 
 # In some cases you might want to add a message bar to a dialog and use logging
 # from there, this adds message_bar to dialog and uses it with message bar
@@ -37,11 +37,11 @@ import logging
 LOGGER = logging.getLogger(__name__)
 
 # Later in the code
-LOGGER.debug('Log some debug messages')
-LOGGER.info('Log some info here')
-LOGGER.warning('Log a warning here')
-LOGGER.error('Log an error here')
-LOGGER.critical('Log a critical error here')
+LOGGER.debug("Log some debug messages")
+LOGGER.info("Log some info here")
+LOGGER.warning("Log a warning here")
+LOGGER.error("Log an error here")
+LOGGER.critical("Log a critical error here")
 
 # To show a message bar in addition to logging a message use
 # either MsgBar helpers
@@ -49,14 +49,14 @@ LOGGER.critical('Log a critical error here')
 from qgis_plugin_tools.tools.messages import MsgBar
 
 MsgBar.info("Msg bar message", "some details here")
-MsgBar.warning('Msg bar message', "some details here", success=True)
+MsgBar.warning("Msg bar message", "some details here", success=True)
 
 # or "extra" kwarg dict with data, creatable also with bar_msg helper
 
 from qgis_plugin_tools.tools.custom_logging import bar_msg
 
-LOGGER.warning('Msg bar message', extra={'details:': "some details here"})
-LOGGER.error('Msg bar message', extra=bar_msg("some details here", duration=10))
+LOGGER.warning("Msg bar message", extra={"details:": "some details here"})
+LOGGER.error("Msg bar message", extra=bar_msg("some details here", duration=10))
 ```
 
 ## Exceptions
@@ -71,12 +71,14 @@ from .qgis_plugin_tools.tools.i18n import tr
 
 try:
     # do something that might throw exception
-    raise QgsPluginNotImplementedException(tr('This is not implemented'), bar_msg(tr('Please implement')))
+    raise QgsPluginNotImplementedException(
+        tr("This is not implemented"), bar_msg(tr("Please implement"))
+    )
 except QgsPluginException as e:
     # Shows bar message
     MsgBar.exception(str(e), **e.bar_msg)
 except Exception as e:
-    MsgBar.exception(tr('Unhandled exception occurred'), e)
+    MsgBar.exception(tr("Unhandled exception occurred"), e)
 ```
 
 Check [tests](../testing/test_decorations.py) for more examples.
@@ -90,7 +92,7 @@ Check [tests](../testing/test_network.py) for more examples.
 ```python
 from .qgis_plugin_tools.tools.network import fetch
 
-contents = fetch('www.examapleurl.com')
+contents = fetch("www.examapleurl.com")
 ```
 
 ## Settings tools
@@ -124,9 +126,9 @@ if file_path:
     QCoreApplication.installTranslator(self.translator)
 
 # Wrap translatable string with tr
-tr('This will be translated')
-tr('Meaning of life is {}?', 42)
-tr('{} + {} is definitely {}', 1,1,3)
+tr("This will be translated")
+tr("Meaning of life is {}?", 42)
+tr("{} + {} is definitely {}", 1, 1, 3)
 ```
 
 ### Setting up translations
@@ -160,14 +162,14 @@ import glob
 
 from qgis_plugin_tools.infrastructure.plugin_maker import PluginMaker
 
-'''
+"""
 #################################################
 # Edit the following to match the plugin
 #################################################
-'''
+"""
 
-locales = ['fi']
-profile = 'foo'
+locales = ["fi"]
+profile = "foo"
 py_files = [fil for fil in glob.glob("**/*.py", recursive=True) if "test/" not in fil]
 ui_files = list(glob.glob("**/*.ui", recursive=True))
 resources = list(glob.glob("**/*.qrc", recursive=True))
@@ -175,8 +177,15 @@ extra_dirs = ["resources"]
 compiled_resources = ["resources.py"]
 
 
-PluginMaker(py_files=py_files, ui_files=ui_files, resources=resources, extra_dirs=extra_dirs,
-            compiled_resources=compiled_resources, locales=locales, profile=profile)
+PluginMaker(
+    py_files=py_files,
+    ui_files=ui_files,
+    resources=resources,
+    extra_dirs=extra_dirs,
+    compiled_resources=compiled_resources,
+    locales=locales,
+    profile=profile,
+)
 ```
 
 And use it like:
