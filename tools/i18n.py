@@ -39,7 +39,7 @@ def setup_translation(
                 if ts_file.exists():
                     return locale, ts_file.absoluteFilePath()
 
-            prefixed_locale = prefix + locale[0:2]
+            prefixed_locale = prefix + locale[:2]
             if fldr:
                 ts_file = QFileInfo(join(fldr, file_pattern.format(prefixed_locale)))
                 if ts_file.exists():

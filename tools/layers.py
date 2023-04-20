@@ -56,10 +56,14 @@ class LayerType(enum.Enum):
 
     @staticmethod
     def from_wkb_type(wkb_type: int) -> "LayerType":
-        for l_type in LayerType:
-            if QgsWkbTypes.flatType(wkb_type) in l_type.wkb_types:
-                return l_type
-        return LayerType.Unknown
+        return next(
+            (
+                l_type
+                for l_type in LayerType
+                if QgsWkbTypes.flatType(wkb_type) in l_type.wkb_types
+            ),
+            LayerType.Unknown,
+        )
 
     @staticmethod
     def from_layer(layer: QgsVectorLayer) -> "LayerType":

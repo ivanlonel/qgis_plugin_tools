@@ -54,17 +54,12 @@ def qgis_level(logging_level: str) -> int:
     :return: The QGIS Level
     :rtype: Qgis.MessageLevel
     """
-    if logging_level == "CRITICAL":
+    if logging_level in {"CRITICAL", "ERROR"}:
         return Qgis.Critical
-    elif logging_level == "ERROR":
-        return Qgis.Critical
+    elif logging_level in {"INFO", "DEBUG"}:
+        return Qgis.Info
     elif logging_level == "WARNING":
         return Qgis.Warning
-    elif logging_level == "INFO":
-        return Qgis.Info
-    elif logging_level == "DEBUG":
-        return Qgis.Info
-
     return Qgis.Info
 
 
@@ -138,9 +133,7 @@ class QgsMessageBarFilter(logging.Filter):
             return False
 
         record.qgis_level = (  # type: ignore
-            qgis_level(record.levelname)
-            if not args.get("success", False)
-            else Qgis.Success
+            Qgis.Success if args.get("success", False) else qgis_level(record.levelname)
         )
         record.duration = args.get("duration", self.bar_msg_duration(record.levelname))  # type: ignore # noqa E501
         return True
@@ -156,13 +149,10 @@ class QgsMessageBarFilter(logging.Filter):
             return 12
         elif logging_level == "ERROR":
             return 10
+        elif logging_level in {"INFO", "DEBUG"}:
+            return 4
         elif logging_level == "WARNING":
             return 6
-        elif logging_level == "INFO":
-            return 4
-        elif logging_level == "DEBUG":
-            return 4
-
         return 4
 
 
@@ -314,7 +304,7 @@ def _create_handlers(
     # to use the lowest level on the handlers returned from this function
     qgis_message_log_handler = QgsLogHandler(message_log_name=message_log_name)
     qgis_message_log_handler.setLevel(
-        logging.NOTSET if len(handlers) == 0 else min(h.level for h in handlers)
+        min(h.level for h in handlers) if handlers else logging.NOTSET
     )
     qgis_message_log_formatter = logging.Formatter("[%(levelname)-7s]- %(message)s")
     qgis_message_log_handler.setFormatter(qgis_message_log_formatter)
@@ -349,11 +339,7 @@ def setup_logger(  # noqa QGS105
         except ImportError:
             iface = None
 
-    if iface is not None:
-        message_bar = iface.messageBar()
-    else:
-        message_bar = None
-
+    message_bar = iface.messageBar() if iface is not None else None
     # keep api stable and create the handlers as if the passed logger name
     # was plugin_name()
     handlers = _create_handlers(plugin_name(), message_bar)

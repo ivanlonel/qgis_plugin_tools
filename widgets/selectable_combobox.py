@@ -45,11 +45,11 @@ class CheckableComboBox:
         self.text_changed(None)
 
     def selected_items(self) -> list:
-        checked_items = []
-        for item in self.model.findItems("*", Qt.MatchWildcard):
-            if item.checkState() == Qt.Checked:
-                checked_items.append(item.data())
-        return checked_items
+        return [
+            item.data()
+            for item in self.model.findItems("*", Qt.MatchWildcard)
+            if item.checkState() == Qt.Checked
+        ]
 
     def set_selected_items(self, items):
         for item in self.model.findItems("*", Qt.MatchWildcard):
@@ -80,11 +80,7 @@ class CheckableFieldComboBox(CheckableComboBox):
 
         for i, field in enumerate(self.layer.fields()):
             alias = field.alias()
-            if alias:
-                name = "{} ({})".format(field.name(), alias)
-            else:
-                name = field.name()
-            item = QStandardItem(name)
+            item = QStandardItem(f"{field.name()} ({alias})" if alias else field.name())
             item.setData(field.name())
             item.setIcon(self.layer.fields().iconForField(i))
             self.append_row(item)
