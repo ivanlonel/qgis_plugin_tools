@@ -1,20 +1,16 @@
 """Tests QGIS plugin init. Modified from unittest to pytest and using plugin_path"""
 
-
 __author__ = "Tim Sutton <tim@linfiniti.com>"
 __revision__ = "$Format:%H$"
 __date__ = "17/10/2010"
 __license__ = "GPL"
+__copyright__ = "Copyright 2012, Australia Indonesia Facility for Disaster Reduction"
 import configparser
 
 import pytest
 
 from ..testing.utilities import is_running_in_tools_module_ci
 from ..tools.resources import plugin_path
-
-__copyright__ = (
-    "Copyright 2012, Australia Indonesia Facility for " + "Disaster Reduction"
-)
 
 
 @pytest.mark.skipif(is_running_in_tools_module_ci(), reason="In CI")
@@ -44,6 +40,8 @@ def test_read_init():
     metadata.extend(parser.items("general"))
 
     for expectation in required_metadata:
-        message = f'Cannot find metadata "{expectation}" in metadata source ({file_path}).'
+        message = (
+            f'Cannot find metadata "{expectation}" in metadata source ({file_path}).'
+        )
 
         assert expectation in dict(metadata), message

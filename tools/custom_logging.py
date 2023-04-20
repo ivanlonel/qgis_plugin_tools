@@ -132,10 +132,8 @@ class QgsMessageBarFilter(logging.Filter):
         if "details" not in args:
             return False
 
-        record.qgis_level = (
-            Qgis.Success
-            if args.get("success", False)
-            else qgis_level(record.levelname)
+        record.qgis_level = (  # type: ignore
+            Qgis.Success if args.get("success", False) else qgis_level(record.levelname)
         )
         record.duration = args.get("duration", self.bar_msg_duration(record.levelname))  # type: ignore # noqa E501
         return True

@@ -195,7 +195,7 @@ Put -h after command to see available optional arguments if any
                 raise ValueError(f"The expected resource file {fil} is missing!")
 
     def _get_platform_args(self):
-        return ["cmd", "/c"] if is_windows() else []
+        return ["cmd", "/c"] if is_windows() else []  # noqa W605
 
     def deploy(self):
         self.compile()
