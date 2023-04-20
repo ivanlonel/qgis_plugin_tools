@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # flake8: noqa
 import argparse
 import os
@@ -8,7 +7,6 @@ import subprocess
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
-from typing import List
 from zipfile import ZipFile
 
 from ..tools.resources import plugin_name, plugin_path, resources_path
@@ -31,7 +29,7 @@ ROOT_DIR = str(Path(__file__).parent.parent.parent.parent.resolve())
 SUBMODULES = ["qgis_plugin_tools"]
 
 # Add files for any locales you want to support here
-LOCALES: List[str] = []
+LOCALES: list[str] = []
 
 # If locales are enabled, set the name of the lrelease binary on your system. If
 # you have trouble compiling the translations, you may have to specify the full path to
@@ -44,7 +42,7 @@ PYRCC = "pyrcc5"
 PROFILE = "default"
 
 # Resource files
-RESOURCES_SRC: List[str] = []
+RESOURCES_SRC: list[str] = []
 
 EXTRAS = ["metadata.txt"]
 
@@ -350,7 +348,7 @@ Put -h after command to see available optional arguments if any
 
     def venv(self):
         try:
-            from qgis.core import QgsVectorLayer
+            pass
         except ImportError:
             print("Your python environment has no access to QGIS libraries!")
             return

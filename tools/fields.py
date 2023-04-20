@@ -1,4 +1,4 @@
-from typing import Type, Union
+from typing import Union
 
 from qgis.core import QgsApplication, QgsFields
 from qgis.gui import QgsDateTimeEdit, QgsDoubleSpinBox, QgsSpinBox
@@ -72,7 +72,7 @@ def widget_for_field(field_type: QVariant) -> QWidget:
         return q_combo_box
 
 
-def value_for_widget(widget: Type[QWidget]) -> Union[str, bool, float, int]:
+def value_for_widget(widget: type[QWidget]) -> Union[str, bool, float, int]:
     if isinstance(widget, QComboBox):
         return widget.currentText()
     elif isinstance(widget, QCheckBox):

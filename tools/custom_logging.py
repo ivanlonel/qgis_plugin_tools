@@ -5,7 +5,7 @@ import logging
 from enum import Enum, unique
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Optional
 
 from qgis.core import Qgis, QgsApplication, QgsMessageLog
 from qgis.gui import QgisInterface, QgsMessageBar
@@ -65,7 +65,7 @@ def qgis_level(logging_level: str) -> int:
 
 def bar_msg(
     details: Any = "", duration: Optional[int] = None, success: bool = False
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Helper function to construct extra arguments for message bar logger message
 
@@ -261,8 +261,8 @@ def get_log_folder() -> Path:
 
 def _create_handlers(
     message_log_name: str, message_bar: Optional[QgsMessageBar]
-) -> List[logging.Handler]:
-    handlers: List[logging.Handler] = []
+) -> list[logging.Handler]:
+    handlers: list[logging.Handler] = []
 
     stream_level = get_log_level(LogTarget.STREAM)
     if stream_level > logging.NOTSET:
@@ -414,7 +414,7 @@ def teardown_logger(logger_name: str) -> None:
         teardown_logger(__name__.replace(".tools.custom_logging", "", 1))
 
 
-def teardown_loggers(logger_names: List[str]) -> None:
+def teardown_loggers(logger_names: list[str]) -> None:
     """
     Remove the added handlers from the speficied handler.
     """

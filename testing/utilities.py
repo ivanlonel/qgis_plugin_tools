@@ -1,10 +1,9 @@
-# coding=utf-8
 """Common functionality used by regression tests."""
 
 import os
 import time
 import warnings
-from typing import Type, Union
+from typing import Union
 
 from qgis.core import QgsApplication, QgsTask
 from qgis.PyQt.QtCore import QCoreApplication
@@ -95,7 +94,7 @@ class SimpleTask(BaseTask):
     def __init__(
         self,
         will_fail: bool = False,
-        error_to_raise: Type[Exception] = ValueError,
+        error_to_raise: type[Exception] = ValueError,
         steps: int = 10,
         sleep_time: float = 0.01,
     ) -> None:

@@ -6,7 +6,6 @@ __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
-from typing import Tuple
 
 import pytest
 
@@ -35,12 +34,12 @@ def task_runner(initialize_logger):
 
 
 @pytest.fixture()
-def file_fixture() -> Tuple[str, bytes, str]:
+def file_fixture() -> tuple[str, bytes, str]:
     with open("test/fixtures/file.xml", "rb") as f:
         yield "file.xml", f.read(), "text/xml"
 
 
 @pytest.fixture()
-def another_file_fixture() -> Tuple[str, bytes, str]:
+def another_file_fixture() -> tuple[str, bytes, str]:
     with open("test/fixtures/text.txt", "rb") as f:
         yield "text.txt", f.read(), "text/plain"

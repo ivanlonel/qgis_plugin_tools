@@ -1,6 +1,6 @@
 import logging
 import sys
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from .custom_logging import bar_msg
 
@@ -15,7 +15,7 @@ class MessageBarLogger:
 
     def __init__(self, logger_name: str) -> None:
         self._logger = logging.getLogger(logger_name)
-        self._logger_kwargs: Dict[str, Any] = (
+        self._logger_kwargs: dict[str, Any] = (
             {}
             if sys.version_info.major == 3 and sys.version_info.minor < 8
             else {"stacklevel": 2}
@@ -41,7 +41,7 @@ class MessageBarLogger:
         self._logger.info(
             str(message),
             extra=bar_msg(details, duration, success),
-            **self._logger_kwargs
+            **self._logger_kwargs,
         )
         if details != "":
             self._logger.info(str(details), **self._logger_kwargs)
@@ -65,7 +65,7 @@ class MessageBarLogger:
         self._logger.warning(
             str(message),
             extra=bar_msg(details, duration, success),
-            **self._logger_kwargs
+            **self._logger_kwargs,
         )
         if details != "":
             self._logger.warning(str(details), **self._logger_kwargs)
@@ -90,7 +90,7 @@ class MessageBarLogger:
         self._logger.error(
             str(message),
             extra=bar_msg(details, duration, success),
-            **self._logger_kwargs
+            **self._logger_kwargs,
         )
         if details != "":
             self._logger.error(str(details), **self._logger_kwargs)
@@ -115,7 +115,7 @@ class MessageBarLogger:
         self._logger.exception(
             str(message),
             extra=bar_msg(details, duration, success),
-            **self._logger_kwargs
+            **self._logger_kwargs,
         )
         if details != "":
             self._logger.error(str(details), **self._logger_kwargs)

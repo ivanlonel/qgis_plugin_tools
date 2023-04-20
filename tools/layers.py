@@ -6,7 +6,7 @@ __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
 import logging
-from typing import List, Optional, Set, Union
+from typing import Optional, Union
 
 from qgis.core import (
     QgsExpression,
@@ -74,7 +74,7 @@ class LayerType(enum.Enum):
         return LayerType.from_wkb_type(geometry.wkbType())
 
     @property
-    def wkb_types(self) -> Set[QgsWkbTypes.GeometryType]:
+    def wkb_types(self) -> set[QgsWkbTypes.GeometryType]:
         return self.value["wkb_types"]
 
 
@@ -106,7 +106,7 @@ def evaluate_expressions(
     exp: QgsExpression,
     feature: Optional[QgsFeature] = None,
     layer: Optional[QgsMapLayer] = None,
-    context_scopes: Optional[List[QgsExpressionContextScope]] = None,
+    context_scopes: Optional[list[QgsExpressionContextScope]] = None,
 ) -> Union[bool, int, str, float, None]:
     """
     Evaluate a QGIS expression

@@ -5,7 +5,7 @@ import importlib.resources
 import sys
 from os.path import abspath, dirname, exists, join, pardir
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog, QWidget
@@ -194,7 +194,7 @@ def metadata_config() -> configparser.ConfigParser:
     return config
 
 
-def qgis_plugin_ci_config() -> Optional[Dict]:
+def qgis_plugin_ci_config() -> Optional[dict]:
     """
     Get configuration of the ci config or None
     """
