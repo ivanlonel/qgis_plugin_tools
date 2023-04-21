@@ -3,7 +3,7 @@ import logging
 import re
 import shutil
 from pathlib import Path
-from typing import Literal, NamedTuple, Optional
+from typing import Literal, NamedTuple, Optional, Union
 from urllib.parse import urlencode
 from uuid import uuid4
 
@@ -243,6 +243,7 @@ def download_to_file(
     output_name: Optional[str] = None,
     use_requests_if_available: bool = True,
     encoding: str = ENCODING,
+    timeout: Optional[Union[float, tuple[float, float]]] = None,
 ) -> Path:
     """
     Downloads a binary file to the file efficiently
@@ -253,6 +254,8 @@ def download_to_file(
     :param use_requests_if_available: Use Python package requests
     if it is available in the environment
     :param encoding: Encoding which will be used to decode the bytes
+    :param timeout: How many seconds to wait for the server to send data before giving
+    up, as a float, or a (connect timeout, read timeout) tuple.
     :return: Path to the file
     """
 
@@ -274,7 +277,7 @@ def download_to_file(
         # https://stackoverflow.com/a/39217788/10068922
 
         try:
-            with requests.get(url, stream=True) as r:
+            with requests.get(url, stream=True, timeout=timeout) as r:
                 try:
                     r.raise_for_status()
                 except Exception:
