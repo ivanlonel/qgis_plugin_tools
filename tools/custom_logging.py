@@ -1,5 +1,6 @@
 """Setting up logging using QGIS, file, Sentry..."""
 
+import contextlib
 import functools
 import logging
 from enum import Enum, unique
@@ -171,7 +172,7 @@ class SimpleMessageBarProxy(QObject):
 
     @pyqtSlot(str, str, int, int)
     def push_message(self, title: str, text: str, level: int, duration: int) -> None:
-        try:
+        with contextlib.suppress(Exception):
             if self._msg_bar is not None:
                 self._msg_bar.pushMessage(
                     title=title,
@@ -179,8 +180,6 @@ class SimpleMessageBarProxy(QObject):
                     level=level,
                     duration=duration,
                 )
-        except Exception:
-            pass
 
 
 class QgsMessageBarHandler(logging.Handler):
