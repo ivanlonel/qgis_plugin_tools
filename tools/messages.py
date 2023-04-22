@@ -16,9 +16,7 @@ class MessageBarLogger:
     def __init__(self, logger_name: str) -> None:
         self._logger = logging.getLogger(logger_name)
         self._logger_kwargs: dict[str, Any] = (
-            {}
-            if sys.version_info.major == 3 and sys.version_info.minor < 8
-            else {"stacklevel": 2}
+            {} if sys.version_info < (3, 8) else {"stacklevel": 2}
         )
 
     def info(
