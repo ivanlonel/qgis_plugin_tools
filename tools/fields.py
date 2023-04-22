@@ -62,9 +62,7 @@ def widget_for_field(field_type: QVariant) -> QWidget:
         return q_combo_box
     elif field_type == QVariant.Type.Date:
         return QDateEdit()
-    elif field_type == QVariant.Type.DateTime:
-        return QgsDateTimeEdit()
-    elif field_type == QVariant.Type.Time:
+    elif field_type in {QVariant.Type.DateTime, QVariant.Type.Time}:
         return QgsDateTimeEdit()
     elif field_type == QVariant.Type.ByteArray:
         return q_combo_box
