@@ -190,7 +190,7 @@ def metadata_config() -> configparser.ConfigParser:
     """
     path = plugin_path("metadata.txt")
     config = configparser.ConfigParser()
-    config.read(path)
+    config.read(path, encoding="utf8")
     return config
 
 
@@ -203,7 +203,7 @@ def qgis_plugin_ci_config() -> Optional[dict]:
         path_str = plugin_path(".qgis-plugin-ci")
     path = Path(path_str)
     if path.exists():
-        with open(path) as f:
+        with open(path, encoding="utf8") as f:
             config = {}
             for line in f:
                 parts = line.split(":")
