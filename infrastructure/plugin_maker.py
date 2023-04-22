@@ -174,7 +174,7 @@ Put -h after command to see available optional arguments if any
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
             parser.print_help()
-            exit(1)
+            sys.exit(1)
 
         # use dispatch pattern to invoke method with same name
         getattr(self, args.command)()
@@ -230,7 +230,7 @@ Put -h after command to see available optional arguments if any
         if args.version is None:
             echo("Give valid version number", force=True)
             parser.print_help()
-            exit(1)
+            sys.exit(1)
 
         if args.tag:
             self.run_command(self._get_platform_args() + ["git", "tag", args.version])
