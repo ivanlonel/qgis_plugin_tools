@@ -148,8 +148,8 @@ def _make_connections_and_run_task(
     completed_callback: Optional[Callable],
     terminated_callback: Optional[Callable],
 ) -> None:
-    task.taskCompleted.connect(lambda: progress_dialog.close())
-    task.taskTerminated.connect(lambda: progress_dialog.close())
+    task.taskCompleted.connect(progress_dialog.close)
+    task.taskTerminated.connect(progress_dialog.close)
     progress_dialog.aborted.connect(task.cancel)
     if completed_callback:
         task.taskCompleted.connect(completed_callback)
