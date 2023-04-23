@@ -57,9 +57,7 @@ def qgis_level(logging_level: str) -> int:
     """
     if logging_level in {"CRITICAL", "ERROR"}:
         return Qgis.Critical
-    elif logging_level in {"INFO", "DEBUG"}:
-        return Qgis.Info
-    elif logging_level == "WARNING":
+    if logging_level == "WARNING":
         return Qgis.Warning
     return Qgis.Info
 
@@ -148,11 +146,9 @@ class QgsMessageBarFilter(logging.Filter):
         """
         if logging_level == "CRITICAL":
             return 12
-        elif logging_level == "ERROR":
+        if logging_level == "ERROR":
             return 10
-        elif logging_level in {"INFO", "DEBUG"}:
-            return 4
-        elif logging_level == "WARNING":
+        if logging_level == "WARNING":
             return 6
         return 4
 
