@@ -52,11 +52,9 @@ COMPILED_RESOURCE_FILES = ["resources.py"]
 
 VENV_NAME = ".venv"
 
-"""
 #################################################
 # Normally you would not need to edit below here
 #################################################
-"""
 
 STARTUP_BAT = r"""
 @echo off

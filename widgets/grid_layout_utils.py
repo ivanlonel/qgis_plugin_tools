@@ -5,8 +5,8 @@ __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
-""" Removing functionality adapted from C example
-https://stackoverflow.com/a/19256990/10068922 """
+# Removing functionality adapted from C example
+# https://stackoverflow.com/a/19256990/10068922
 
 
 def remove_row(layout: QGridLayout, row: int, delete_widgets: bool = True) -> None:
