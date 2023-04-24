@@ -176,9 +176,7 @@ def slug_name() -> str:
 
 
 def task_logger_name() -> str:
-    """
-    Returns the name for task logger
-    """
+    """Returns the name for task logger"""
     return f"{plugin_name()}_task"
 
 
@@ -195,9 +193,7 @@ def metadata_config() -> configparser.ConfigParser:
 
 
 def qgis_plugin_ci_config() -> Optional[dict]:
-    """
-    Get configuration of the ci config or None
-    """
+    """Get configuration of the ci config or None"""
     path_str = root_path(".qgis-plugin-ci")
     if not Path(path_str).exists():
         path_str = plugin_path(".qgis-plugin-ci")

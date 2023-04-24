@@ -35,9 +35,7 @@ def log_if_fails(fn: Callable) -> Callable:
 
 
 def taskify(fn: Callable) -> Callable:
-    """
-    Decoration used to turn any function or method into a FunctionTask task.
-    """
+    """Decoration used to turn any function or method into a FunctionTask task."""
     from functools import wraps
 
     @wraps(fn)

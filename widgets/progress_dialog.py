@@ -31,9 +31,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class ProgressDialog(QDialog, FORM_CLASS):
-    """
-    Dialog containing progress bar to show processes of long running tasks.
-    """
+    """Dialog containing progress bar to show processes of long running tasks."""
 
     progress_bar: QProgressBar
     status_label: QLabel
@@ -92,9 +90,7 @@ def create_simple_continuous_progress_dialog(
     show_abort_button: bool = False,
     abort_btn_text: str = ProgressDialog.abort_btn_text,
 ) -> ProgressDialog:
-    """
-    Creates simple progress dialog with a continuous progress bar.
-    """
+    """Creates simple progress dialog with a continuous progress bar."""
     progress_dialog = ProgressDialog(parent, show_abort_button, abort_btn_text)
     progress_dialog.progress_bar.setMaximum(0)
     progress_dialog.progress_bar.setMinimum(0)
@@ -111,9 +107,7 @@ def run_task_with_progress_dialog(
     completed_callback: Optional[Callable] = None,
     terminated_callback: Optional[Callable] = None,
 ) -> None:
-    """
-    Runs a given task while showing a progress bar dialog.
-    """
+    """Runs a given task while showing a progress bar dialog."""
     progress_dialog = ProgressDialog(parent, show_abort_button, abort_btn_text)
     progress_dialog.set_status(status_text)
     task.progressChanged.connect(progress_dialog.update_progress_bar)
@@ -131,9 +125,7 @@ def run_task_with_continuous_progress_dialog(
     completed_callback: Optional[Callable] = None,
     terminated_callback: Optional[Callable] = None,
 ) -> None:
-    """
-    Runs a given task while showing a simple continuous progress bar dialog.
-    """
+    """Runs a given task while showing a simple continuous progress bar dialog."""
     progress_dialog = create_simple_continuous_progress_dialog(
         status_text, parent, show_abort_button, abort_btn_text
     )
