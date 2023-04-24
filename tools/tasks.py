@@ -68,7 +68,7 @@ class BaseTask(QgsTask):
                 raise self.exception
             except QgsPluginException as e:
                 MsgBar.exception(str(e), **e.bar_msg)
-            except Exception as e:
+            except Exception as e:  # noqa: PIE786
                 MsgBar.exception(tr("Unhandled exception occurred"), e)
 
     def setProgress(self, progress: Union[int, float]) -> None:  # noqa: N802
