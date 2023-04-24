@@ -1,4 +1,3 @@
-# flake8: noqa E501
 __copyright__ = "Copyright 2020-2021, Gispo Ltd"
 __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
@@ -39,7 +38,7 @@ def setup_pydevd(host: str = "localhost", port: int = 5678) -> bool:
     :param host: host of the debug server
     :param port: port of the debug server
     :return: Whether debugger was initialized properly or not
-    """
+    """  # noqa: B950
     succeeded = False
     if _check_if_should_setup():
         try:
@@ -83,7 +82,7 @@ def setup_ptvsd(host: str = "localhost", port: int = 5678) -> bool:
     :param host: host of the debug server
     :param port: port of the debug server
     :return: Whether debugger was initialized properly or not
-    """
+    """  # noqa: B950
     succeeded = False
     if _check_if_should_setup():
         try:
@@ -126,7 +125,7 @@ def setup_debugpy(host: str = "localhost", port: int = 5678) -> bool:
     :param host: host of the debug server
     :param port: port of the debug server
     :return: Whether debugger was initialized properly or not
-    """
+    """  # noqa: B950
     succeeded = False
     if _check_if_should_setup() and not os.environ.get("QGIS_DEBUGPY_HAS_LOADED"):
         try:

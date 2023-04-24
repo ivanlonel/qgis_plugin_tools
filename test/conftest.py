@@ -1,5 +1,4 @@
 # type: ignore
-# flake8: noqa ANN201
 
 __copyright__ = "Copyright 2020-2021, Gispo Ltd"
 __license__ = "GPL version 3"
@@ -21,7 +20,7 @@ from ..tools.settings import set_setting
 
 
 @pytest.fixture(scope="session")
-def initialize_logger(qgis_iface):
+def initialize_logger(qgis_iface):  # noqa: PT004
     set_setting(get_log_level_key(LogTarget.FILE), "NOTSET")
     setup_logger(plugin_name(), qgis_iface)
     yield

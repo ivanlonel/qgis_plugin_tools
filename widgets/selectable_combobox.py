@@ -1,9 +1,11 @@
-# flake8: noqa ANN201, ANN001, ANN204
 """QCombobox with checkbox for selecting multiple items."""
+from collections.abc import Container
+from typing import Optional
+
 from qgis.core import QgsMapLayer
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
-from qgis.PyQt.QtWidgets import QStyledItemDelegate
+from qgis.PyQt.QtWidgets import QAbstractButton, QComboBox, QStyledItemDelegate
 
 __copyright__ = "Copyright 2019, 3Liz"
 __license__ = "GPL version 3"
@@ -15,7 +17,9 @@ class CheckableComboBox:
 
     """Basic QCombobox with selectable items."""
 
-    def __init__(self, combobox, select_all=None):
+    def __init__(
+        self, combobox: QComboBox, select_all: Optional[QAbstractButton] = None
+    ) -> None:
         """Constructor."""
         self.combo = combobox
         self.combo.setEditable(True)
@@ -29,18 +33,18 @@ class CheckableComboBox:
             self.select_all = select_all
             self.select_all.clicked.connect(self.select_all_clicked)
 
-    def select_all_clicked(self):
+    def select_all_clicked(self) -> None:
         for item in self.model.findItems("*", Qt.MatchFlag.MatchWildcard):
             item.setCheckState(Qt.CheckState.Checked)
 
-    def append_row(self, item: QStandardItem):
+    def append_row(self, item: QStandardItem) -> None:
         """Add an item to the combobox."""
         item.setEnabled(True)
         item.setCheckable(True)
         item.setSelectable(False)
         self.model.appendRow(item)
 
-    def combo_changed(self):
+    def combo_changed(self) -> None:
         """Slot when the combo has changed."""
         self.text_changed(None)
 
@@ -51,7 +55,7 @@ class CheckableComboBox:
             if item.checkState() == Qt.CheckState.Checked
         ]
 
-    def set_selected_items(self, items):
+    def set_selected_items(self, items: Container) -> None:
         for item in self.model.findItems("*", Qt.MatchFlag.MatchWildcard):
             item.setCheckState(
                 Qt.CheckState.Checked
@@ -59,7 +63,7 @@ class CheckableComboBox:
                 else Qt.CheckState.Unchecked
             )
 
-    def text_changed(self, text):
+    def text_changed(self, text: Optional[str]) -> None:
         """Update the preview with all selected items, separated by a comma."""
         label = ", ".join(self.selected_items())
         if text != label:
@@ -67,11 +71,13 @@ class CheckableComboBox:
 
 
 class CheckableFieldComboBox(CheckableComboBox):
-    def __init__(self, combobox, select_all=None):
+    def __init__(
+        self, combobox: QComboBox, select_all: Optional[QAbstractButton] = None
+    ) -> None:
         self.layer = None
         super().__init__(combobox, select_all)
 
-    def set_layer(self, layer):
+    def set_layer(self, layer: QgsMapLayer) -> None:
         self.model.clear()
 
         if not layer:
