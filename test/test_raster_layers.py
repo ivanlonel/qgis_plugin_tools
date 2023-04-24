@@ -21,7 +21,7 @@ from ..tools.raster_layers import (
 @pytest.fixture()
 def netcdf_layer(tmpdir) -> QgsRasterLayer:
     path = download_to_file(
-        "https://raw.githubusercontent.com/GispoCoding/FMI2QGIS/master/FMI2QGIS/test/data/aq_small.nc",  # noqa E501
+        "https://raw.githubusercontent.com/GispoCoding/FMI2QGIS/master/FMI2QGIS/test/data/aq_small.nc",  # noqa: E501
         tmpdir,
     )
     return QgsRasterLayer(str(path))
