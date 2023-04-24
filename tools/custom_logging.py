@@ -32,7 +32,7 @@ class LogTarget(Enum):
     BAR = {"id": "bar", "default": "INFO"}
 
     @property
-    def id(self) -> str:
+    def id(self) -> str:  # noqa: A003
         return self.value["id"]
 
     @property
@@ -126,7 +126,7 @@ class QgsMessageBarFilter(logging.Filter):
             Whether the message is success message or not
     """
 
-    def filter(self, record: logging.LogRecord) -> bool:
+    def filter(self, record: logging.LogRecord) -> bool:  # noqa: A003
         args = record.__dict__
         if "details" not in args:
             return False
