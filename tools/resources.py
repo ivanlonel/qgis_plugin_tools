@@ -218,7 +218,6 @@ def plugin_test_data_path(*args: str) -> str:
     :return: Absolute path to the resources folder.
     :rtype: str
     """
-
     path = abspath(abspath(join(root_path(), "test", "data")))
     if not exists(path):
         path = abspath(abspath(join(plugin_path(), "test", "data")))
@@ -285,7 +284,6 @@ def package_file(package: importlib.resources.Package, file_name: str) -> Path:
     Use like importlib.resources, provide a package (module or string)
     and file name/path inside the package.
     """
-
     with importlib.resources.as_file(
         importlib.resources.files(package).joinpath(file_name)
     ) as requested_path:

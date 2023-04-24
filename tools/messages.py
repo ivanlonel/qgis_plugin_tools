@@ -35,7 +35,6 @@ class MessageBarLogger:
             by the user.
         :param success: Whether the message is success message or not
         """
-
         self._logger.info(
             str(message),
             extra=bar_msg(details, duration, success),

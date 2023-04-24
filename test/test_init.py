@@ -16,7 +16,6 @@ from ..tools.resources import plugin_path
 @pytest.mark.skipif(is_running_in_tools_module_ci(), reason="In CI")
 def test_read_init():
     """Test that the plugin __init__ will validate on plugins.qgis.org."""
-
     # You should update this list according to the latest in
     # https://github.com/qgis/qgis-django/blob/master/qgis-app/
     #        plugins/validator.py

@@ -35,7 +35,6 @@ class BaseTask(QgsTask):
 
         :return: whether task finished successfully or not.
         """
-
         LOGGER.debug("Started task %s", self.name)
         try:
             self._check_if_canceled()
