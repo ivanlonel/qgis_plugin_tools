@@ -434,7 +434,7 @@ Put -h after command to see available optional arguments if any
         """https://stackoverflow.com/a/15340518"""
         dirs = [os.path.dirname(file) for file in files]
         dirs.sort(reverse=True)
-        for i in range(len(dirs)):
+        for i in range(len(dirs)):  # pylint: disable=consider-using-enumerate
             if dirs[i] + os.sep not in dirs[i - 1]:
                 need_dir = os.path.normpath(os.path.join(target_dir, dirs[i]))
                 echo("mkdir", need_dir)
