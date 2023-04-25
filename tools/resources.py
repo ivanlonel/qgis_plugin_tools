@@ -2,6 +2,7 @@
 
 import configparser
 import importlib.resources
+import inspect
 import sys
 from os.path import abspath, dirname, exists, join, pardir
 from pathlib import Path
@@ -49,7 +50,6 @@ def _plugin_path_dependency() -> str:
     # relative to the calling modules top level package name
     # probably inefficient, but if the runtime is not a dependency
     # but a subtree instead this might not need any optimizations?
-    import inspect
 
     for frame_info in inspect.stack():
         module_name: Optional[str] = frame_info.frame.f_globals.get("__name__")

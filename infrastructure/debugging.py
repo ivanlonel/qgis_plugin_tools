@@ -42,7 +42,7 @@ def setup_pydevd(host: str = "localhost", port: int = 5678) -> bool:
     succeeded = False
     if _check_if_should_setup():
         try:
-            import pydevd
+            import pydevd  # pylint: disable=import-outside-toplevel
 
             pydevd.settrace(host, port=port, stdoutToServer=True, stderrToServer=True)
             succeeded = True
@@ -86,7 +86,7 @@ def setup_ptvsd(host: str = "localhost", port: int = 5678) -> bool:
     succeeded = False
     if _check_if_should_setup():
         try:
-            import ptvsd
+            import ptvsd  # pylint: disable=import-outside-toplevel
 
             ptvsd.enable_attach((host, port))
             succeeded = True
@@ -129,7 +129,7 @@ def setup_debugpy(host: str = "localhost", port: int = 5678) -> bool:
     succeeded = False
     if _check_if_should_setup() and not os.environ.get("QGIS_DEBUGPY_HAS_LOADED"):
         try:
-            import debugpy
+            import debugpy  # pylint: disable=import-outside-toplevel
 
             debugpy.configure(python=shutil.which("python"))
             debugpy.listen((host, port))

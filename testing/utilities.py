@@ -37,6 +37,7 @@ def is_running_in_tools_module_ci() -> bool:
 
 def qgis_supports_temporal() -> bool:
     try:
+        # pylint: disable-next=unused-import,import-outside-toplevel
         from qgis.core import QgsRasterLayerTemporalProperties  # noqa: F401
 
         return True

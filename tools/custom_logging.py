@@ -329,6 +329,7 @@ def setup_logger(  # noqa: QGS105
     """
     if iface is None:
         try:
+            # pylint: disable-next=import-outside-toplevel
             from qgis.utils import iface  # type: ignore
         except ImportError:
             iface = None
@@ -427,7 +428,7 @@ def setup_loggers(
     """
     if message_bar is None:
         try:
-            from qgis.utils import iface
+            from qgis.utils import iface  # pylint: disable=import-outside-toplevel
 
             message_bar = iface.messageBar()
         except ImportError:
