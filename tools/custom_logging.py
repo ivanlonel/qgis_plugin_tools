@@ -345,8 +345,8 @@ def setup_logger(  # noqa: QGS105
     if logger_name == plugin_name():
         logger_names.append(__name__.replace(".tools.custom_logging", "", 1))
 
-    for logger_name in logger_names:
-        logger = logging.getLogger(logger_name)
+    for name in logger_names:
+        logger = logging.getLogger(name)
 
         # take the lowest level from the enabled handlers
         logger.setLevel(min(h.level for h in handlers))
