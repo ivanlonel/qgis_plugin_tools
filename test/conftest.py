@@ -28,7 +28,7 @@ def initialize_logger(qgis_iface):  # noqa: PT004
 
 
 @pytest.fixture()
-def task_runner(initialize_logger):
+def task_runner(initialize_logger):  # pylint: disable=redefined-outer-name
     return TestTaskRunner()
 
 
