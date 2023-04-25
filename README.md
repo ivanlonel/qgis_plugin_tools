@@ -41,7 +41,7 @@ This will create needed structure for your plugin
 
 1. Go to the root folder of your plugin code source
 1. `git submodule add https://github.com/GispoCoding/qgis_plugin_tools.git`
-1. To get most out of the submodule, try to refactor the plugin to use the default [plugin tree](#Plugin-tree-example)
+1. To get most out of the submodule, try to refactor the plugin to use the default [plugin tree](#plugin-tree-example)
 
 ### As external dependency
 
