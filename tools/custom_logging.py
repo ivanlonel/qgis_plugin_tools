@@ -131,10 +131,10 @@ class QgsMessageBarFilter(logging.Filter):
         if "details" not in args:
             return False
 
-        record.qgis_level = (  # type: ignore
+        record.qgis_level = (
             Qgis.Success if args.get("success", False) else qgis_level(record.levelname)
         )
-        record.duration = args.get("duration", self.bar_msg_duration(record.levelname))  # type: ignore # noqa: E501
+        record.duration = args.get("duration", self.bar_msg_duration(record.levelname))
         return True
 
     @staticmethod
@@ -196,9 +196,9 @@ class QgsMessageBarHandler(logging.Handler):
         """
         self._message_bar_proxy.emit_message(
             record.message,
-            record.details,  # type: ignore
-            record.qgis_level,  # type: ignore
-            record.duration,  # type: ignore
+            record.details,
+            record.qgis_level,
+            record.duration,
         )
 
 
@@ -330,7 +330,7 @@ def setup_logger(  # noqa: QGS105
     if iface is None:
         try:
             # pylint: disable-next=import-outside-toplevel
-            from qgis.utils import iface  # type: ignore
+            from qgis.utils import iface
         except ImportError:
             iface = None
 
@@ -366,7 +366,7 @@ def add_logger_msg_bar_to_widget(logger_name: str, widget: QWidget) -> None:
     """
     if not hasattr(widget, "message_bar"):
         layout: QLayout = widget.layout()
-        widget.message_bar = QgsMessageBar(widget)  # type: ignore
+        widget.message_bar = QgsMessageBar(widget)
         if isinstance(layout, QVBoxLayout):
             # noinspection PyArgumentList
             layout.insertWidget(0, widget.message_bar)

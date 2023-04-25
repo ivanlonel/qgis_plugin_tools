@@ -52,7 +52,7 @@ class LayerType(enum.Enum):
     Point = {"wkb_types": POINT_TYPES}
     Line = {"wkb_types": LINE_TYPES}
     Polygon = {"wkb_types": POLYGON_TYPES}
-    Unknown = {"wkb_types": set()}  # type: ignore
+    Unknown = {"wkb_types": set()}
 
     @staticmethod
     def from_wkb_type(wkb_type: int) -> "LayerType":
