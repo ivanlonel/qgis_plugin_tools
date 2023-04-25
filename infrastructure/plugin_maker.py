@@ -133,7 +133,7 @@ class PluginMaker:
         verbose: Optional[bool] = None,
         submodules: Optional[list[str]] = None,
     ) -> None:
-        global VERBOSE
+        global VERBOSE  # pylint: disable=global-statement
         self.py_files = py_files
         self.ui_files = ui_files
         self.resources = resources if resources is not None else RESOURCES_SRC
