@@ -14,6 +14,7 @@ from ..tools.network import download_to_file, fetch, post
 def test_fetch(qgis_new_project):
     data = fetch("https://httpbin.org/get")
     data = json.loads(data)
+    assert isinstance(data, dict)
     assert data["url"] == "https://httpbin.org/get"
 
 
@@ -25,6 +26,7 @@ def test_fetch_invalid_url(qgis_new_project):
 def test_fetch_params(qgis_new_project):
     data = fetch("https://httpbin.org/get", params={"foo": "bar"})
     data = json.loads(data)
+    assert isinstance(data, dict)
     assert data["url"] == "https://httpbin.org/get?foo=bar"
     assert data["args"] == {"foo": "bar"}
 
@@ -32,6 +34,7 @@ def test_fetch_params(qgis_new_project):
 def test_post(qgis_new_project):
     data = post("https://httpbin.org/post")
     data = json.loads(data)
+    assert isinstance(data, dict)
     assert data["url"] == "https://httpbin.org/post"
 
 
@@ -43,6 +46,7 @@ def test_post_invalid_url(qgis_new_project):
 def test_post_data(qgis_new_project):
     data = post("https://httpbin.org/post", data={"foo": "bar"})
     data = json.loads(data)
+    assert isinstance(data, dict)
     assert data["url"] == "https://httpbin.org/post"
     assert data["data"] == json.dumps({"foo": "bar"})
 
@@ -54,6 +58,7 @@ def test_upload_file(qgis_new_project, file_fixture):
         files=[("file", (file_name, file_content, file_type))],
     )
     data = json.loads(data)
+    assert isinstance(data, dict)
     assert data["url"] == "https://httpbin.org/post"
     assert data["files"]
     assert bytes(data["files"]["file"], "utf-8") == file_content
@@ -73,6 +78,7 @@ def test_upload_multiple_files(qgis_new_project, file_fixture, another_file_fixt
         ],
     )
     data = json.loads(data)
+    assert isinstance(data, dict)
     assert data["url"] == "https://httpbin.org/post"
     assert data["files"]
     assert bytes(data["files"]["file"], "utf-8") == file_content
