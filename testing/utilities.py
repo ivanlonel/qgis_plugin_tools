@@ -3,10 +3,10 @@
 import os
 import time
 import warnings
-from typing import NoReturn, Union
+from typing import NoReturn, Union, cast
 
 from qgis.core import QgsApplication, QgsTask
-from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication, pyqtBoundSignal
 
 from ..tools.exceptions import QgsPluginNotImplementedException
 from ..tools.tasks import BaseTask
@@ -68,9 +68,9 @@ class TestTaskRunner:
         sleep_before_cancel: Union[int, float] = 0.0,
     ) -> bool:
         """Run task and return whether it was successful or not."""
-        task.taskCompleted.connect(self.completed)
-        task.taskTerminated.connect(self.terminated)
-        task.progressChanged.connect(self.set_progress)
+        cast(pyqtBoundSignal, task.taskCompleted).connect(self.completed)
+        cast(pyqtBoundSignal, task.taskTerminated).connect(self.terminated)
+        cast(pyqtBoundSignal, task.progressChanged).connect(self.set_progress)
         QgsApplication.taskManager().addTask(task)
 
         if cancel:
