@@ -52,10 +52,10 @@ class LayerType(enum.Enum):
     Point = {"wkb_types": POINT_TYPES}
     Line = {"wkb_types": LINE_TYPES}
     Polygon = {"wkb_types": POLYGON_TYPES}
-    Unknown = {"wkb_types": set()}
+    Unknown: dict[str, set[QgsWkbTypes.Type]] = {"wkb_types": set()}
 
     @staticmethod
-    def from_wkb_type(wkb_type: int) -> "LayerType":
+    def from_wkb_type(wkb_type: QgsWkbTypes.Type) -> "LayerType":
         return next(
             (
                 l_type
@@ -74,7 +74,7 @@ class LayerType(enum.Enum):
         return LayerType.from_wkb_type(geometry.wkbType())
 
     @property
-    def wkb_types(self) -> set[QgsWkbTypes.GeometryType]:
+    def wkb_types(self) -> set[QgsWkbTypes.Type]:
         return self.value["wkb_types"]
 
 
@@ -82,7 +82,7 @@ def set_temporal_settings(
     layer: QgsVectorLayer,
     dt_field: str,
     time_step: int,
-    unit: "QgsUnitTypes.TemporalUnit" = None,
+    unit: Optional["QgsUnitTypes.TemporalUnit"] = None,
 ) -> None:
     """
     Set temporal settings for vector layer temporal range for raster layer
@@ -125,7 +125,7 @@ def evaluate_expressions(
     if feature:
         context.setFeature(feature)
 
-    value = exp.evaluate(context)
+    value: Union[bool, int, str, float, None] = exp.evaluate(context)
     if exp.hasParserError():
         raise QgsPluginExpressionException(bar_msg=bar_msg(exp.parserErrorString()))
 
