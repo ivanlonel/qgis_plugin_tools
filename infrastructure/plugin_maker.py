@@ -356,14 +356,12 @@ Put -h after command to see available optional arguments if any
             print("Your python environment has no access to QGIS libraries!")
             return
 
+        env = os.environ.copy()
         if is_windows():
-            env = os.environ.copy()
             env["PATH"] += (
-                f';{os.path.join(os.path.expanduser("~"), "AppData", "Local", "Programs", "Git", "cmd")}'
+                f';{os.path.join(env["LOCALAPPDATA"], "Programs", "Git", "cmd")}'
                 ";C:\\Program Files\\Git\\cmd"
             )
-        else:
-            env = os.environ
 
         print("Installing virtual environment")
         requirements = os.path.join(ROOT_DIR, "requirements-dev.txt")
