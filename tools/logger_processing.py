@@ -14,14 +14,14 @@ LOGGER = logging.getLogger(__name__)
 class LoggerProcessingFeedBack(QgsProcessingFeedback):
     def __init__(self, use_logger: bool = False) -> None:
         super().__init__()
-        self._last = None
-        self.use_logger = use_logger
-        self.last_progress_text = None
-        self.last_push_info = None
-        self.last_command_info = None
-        self.last_debug_info = None
-        self.last_console_info = None
-        self.last_report_error = None
+        self._last: Optional[str] = None
+        self.use_logger: bool = use_logger
+        self.last_progress_text: Optional[str] = None
+        self.last_push_info: Optional[str] = None
+        self.last_command_info: Optional[str] = None
+        self.last_debug_info: Optional[str] = None
+        self.last_console_info: Optional[str] = None
+        self.last_report_error: Optional[str] = None
 
     @property
     def last(self) -> Optional[str]:
