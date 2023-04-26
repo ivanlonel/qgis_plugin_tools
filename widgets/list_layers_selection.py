@@ -1,7 +1,7 @@
 """QListWidget with layers selection."""
 from typing import Optional
 
-from qgis.core import QgsMapLayer, QgsMapLayerModel, QgsProject
+from qgis.core import QgsMapLayerModel, QgsMapLayerType, QgsProject
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QListWidget, QListWidgetItem, QWidget
 
@@ -24,7 +24,7 @@ class ListLayersSelection(QListWidget):
         self.clear()
 
         for layer in self.project.mapLayers().values():
-            if layer.type() != QgsMapLayer.VectorLayer:
+            if layer.type() != QgsMapLayerType.VectorLayer:
                 continue
 
             if not layer.isSpatial():

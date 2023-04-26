@@ -17,7 +17,7 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
         return type(self)()
 
     def flags(self) -> QgsProcessingAlgorithm.Flags:
-        return super().flags() | QgsProcessingAlgorithm.FlagHideFromModeler
+        return super().flags() | QgsProcessingAlgorithm.Flag.FlagHideFromModeler
 
     def icon(self) -> QIcon:
         icon = resources_path("icons", "icon.png")
