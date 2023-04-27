@@ -95,13 +95,12 @@ class QgsLogHandler(logging.Handler):
         :param record: logging record containing whatever info needs to be
                 logged.
         """
-        tag_kwargs = (
-            {} if self._message_log_name is None else {"tag": self._message_log_name}
-        )
         try:
             # noinspection PyCallByClass,PyTypeChecker
             QgsMessageLog.logMessage(
-                record.getMessage(), level=qgis_level(record.levelname), **tag_kwargs
+                record.getMessage(),
+                tag=self._message_log_name or "",
+                level=qgis_level(record.levelname),
             )
         except MemoryError:
             message = tr(
@@ -111,7 +110,9 @@ class QgsLogHandler(logging.Handler):
             # print(message)
             # noinspection PyCallByClass,PyTypeChecker
             QgsMessageLog.logMessage(
-                message, level=Qgis.MessageLevel.Critical, **tag_kwargs
+                message,
+                tag=self._message_log_name or "",
+                level=Qgis.MessageLevel.Critical,
             )
 
 
