@@ -1,10 +1,19 @@
-from typing import Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, Union
 
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSettings
 from qgis.PyQt.QtCore import QVariant
 
 from .exceptions import QgsPluginInvalidProjectSetting
 from .resources import plugin_name
+
+if TYPE_CHECKING:
+    from typing import TypedDict
+
+    from typing_extensions import NotRequired
+
+    class QgsSettingsValueKeywordArgs(TypedDict):
+        section: QgsSettings.Section
+        type: NotRequired[type]  # noqa: A003
 
 
 def setting_key(*args: str) -> str:
@@ -18,7 +27,7 @@ def setting_key(*args: str) -> str:
 
 def get_setting(
     key: str,
-    default: Optional[Any] = None,
+    default: Any = None,
     typehint: Optional[type] = None,
     internal: bool = True,
     section: QgsSettings.Section = QgsSettings.Section.NoSection,
@@ -33,12 +42,11 @@ def get_setting(
     :param section: Section argument can be used to get a value from
     a specific Section.
     """
-    s = QgsSettings()
-    kwargs = {"defaultValue": default, "section": section}
-
+    kwargs: "QgsSettingsValueKeywordArgs" = {"section": section}
     if typehint is not None:
         kwargs["type"] = typehint
-    return s.value(setting_key(key) if internal else key, **kwargs)
+
+    return QgsSettings().value(setting_key(key) if internal else key, default, **kwargs)
 
 
 def set_setting(

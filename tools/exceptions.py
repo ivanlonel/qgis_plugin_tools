@@ -3,11 +3,14 @@ __license__ = "GPL version 2"
 __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
-from typing import Any, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 from qgis.PyQt.QtNetwork import QNetworkReply
 
 from .i18n import tr
+
+if TYPE_CHECKING:
+    from .custom_logging import BarMsg
 
 
 class QgsPluginException(Exception):
@@ -17,10 +20,10 @@ class QgsPluginException(Exception):
     default_msg = ""
 
     def __init__(
-        self, message: Optional[str] = None, bar_msg: Optional[dict[str, Any]] = None
+        self, message: Optional[str] = None, bar_msg: Optional["BarMsg"] = None
     ) -> None:
-        """
-        Initializes the exception with custom bar_msg to be shown in message bar
+        """Initializes the exception with custom bar_msg to be shown in message bar
+
         :param message: Title of the message
         :param bar_msg: dictionary formed by tools.custom_logging.bar_msg
         """
@@ -28,7 +31,7 @@ class QgsPluginException(Exception):
             message = self.default_msg
         self.message = message
         super().__init__(message)
-        self.bar_msg: dict[str, Any] = bar_msg if bar_msg is not None else {}
+        self.bar_msg: "BarMsg" = bar_msg if bar_msg is not None else {}
 
 
 class QgsPluginNetworkException(QgsPluginException):
