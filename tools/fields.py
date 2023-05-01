@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, cast
 
 from qgis.core import QgsApplication, QgsFields
 from qgis.gui import QgsDateTimeEdit, QgsDoubleSpinBox, QgsSpinBox
@@ -60,11 +60,11 @@ def widget_for_field(field_type: QVariant) -> QWidget:
     return q_combo_box
 
 
-def value_for_widget(widget: type[QWidget]) -> Union[str, bool, float, int]:
+def value_for_widget(widget: QWidget) -> Union[str, bool, float, int]:
     if isinstance(widget, QComboBox):
-        return widget.currentText()
+        return cast(str, widget.currentText())
     if isinstance(widget, QCheckBox):
-        return widget.isChecked()
+        return cast(bool, widget.isChecked())
     if isinstance(widget, QgsDateTimeEdit):
         return widget.dateTime().toString("yyyy-MM-dd hh:mm:ss")
     if isinstance(widget, (QgsSpinBox, QgsDoubleSpinBox)):
