@@ -263,7 +263,7 @@ def load_ui(*args: str) -> QWidget:
 def ui_file_dialog(*ui_file_name_parts: str) -> type[QDialog]:
     """DRY helper for building classes from a .ui file"""
 
-    class UiFileDialogClass(QDialog, load_ui(*ui_file_name_parts)):  # type: ignore
+    class UiFileDialogClass(QDialog, load_ui(*ui_file_name_parts)):  # type: ignore[misc]
         def __init__(
             self,
             parent: Optional[QWidget],
