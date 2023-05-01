@@ -1,3 +1,4 @@
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Any, Optional, Union
 
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSettings
@@ -109,7 +110,7 @@ def get_project_setting(
 
 
 def set_project_setting(
-    key: str, value: Union[str, int, float, bool], internal: bool = True
+    key: str, value: Union[str, int, float, bool, Iterable[str]], internal: bool = True
 ) -> bool:
     """
     Set a value in the QGIS project settings
@@ -120,6 +121,10 @@ def set_project_setting(
     """
     proj = QgsProject.instance()
     if internal:
+        if isinstance(value, bool):
+            return proj.writeEntryBool(plugin_name(), key, value)
+        if isinstance(value, float):
+            return proj.writeEntryDouble(plugin_name(), key, value)
         return proj.writeEntry(plugin_name(), key, value)
     QgsExpressionContextUtils.setProjectVariable(proj, key, value)
     return True
