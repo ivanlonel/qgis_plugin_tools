@@ -46,9 +46,9 @@ def widget_for_field(field_type: QVariant) -> QWidget:
         spin_box.setMaximum(2147483647)
         return spin_box
     if field_type == QVariant.Type.Double:
-        spin_box = QgsDoubleSpinBox()
-        spin_box.setMaximum(2147483647)
-        return spin_box
+        double_spin_box = QgsDoubleSpinBox()
+        double_spin_box.setMaximum(2147483647)
+        return double_spin_box
     if field_type == QVariant.Type.Date:
         return QDateEdit()
     if field_type in {QVariant.Type.DateTime, QVariant.Type.Time}:
