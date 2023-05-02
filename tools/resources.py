@@ -201,6 +201,12 @@ def qgis_plugin_ci_config() -> Optional[dict]:
                 config[parts[0]] = ":".join(parts[1:])
 
         return config
+
+    parser = configparser.ConfigParser()
+    parser.read((root_path("setup.cfg"), plugin_path("setup.cfg")), encoding="utf8")
+    if "qgis-plugin-ci" in parser.sections():
+        return dict(parser.items("qgis-plugin-ci"))
+
     return None
 
 
