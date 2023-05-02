@@ -36,7 +36,7 @@ def t_range() -> QgsDateTimeRange:
 
 
 @pytest.fixture()
-def configured_layer(netcdf_layer, t_range) -> QgsRasterLayer:
+def configured_layer(netcdf_layer: QgsRasterLayer, t_range) -> QgsRasterLayer:
     set_raster_renderer_to_singleband(netcdf_layer)
     set_fixed_temporal_range(netcdf_layer, t_range)
     return netcdf_layer
