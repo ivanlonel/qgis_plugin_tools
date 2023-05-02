@@ -1,7 +1,8 @@
 """QListWidget with fields selection."""
+from collections.abc import Container
 from typing import Optional
 
-from qgis.core import QgsVectorLayer
+from qgis.core import QgsField, QgsVectorLayer
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QListWidget, QListWidgetItem, QWidget
 
@@ -33,7 +34,7 @@ class ListFieldsSelection(QListWidget):
                 cell.setIcon(self.layer.fields().iconForField(index))
             self.addItem(cell)
 
-    def set_selection(self, fields: tuple) -> None:
+    def set_selection(self, fields: Container[QgsField]) -> None:
         for i in range(self.count()):
             item = self.item(i)
             item.setSelected(item.data(Qt.ItemDataRole.UserRole) in fields)
