@@ -8,7 +8,7 @@ import json
 import pytest
 
 from ..tools.exceptions import QgsPluginNetworkException
-from ..tools.network import download_to_file, fetch, post
+from ..tools.network import FileField, FileInfo, download_to_file, fetch, post
 
 
 def test_fetch(qgis_new_project):
@@ -55,7 +55,7 @@ def test_upload_file(qgis_new_project, file_fixture):
     file_name, file_content, file_type = file_fixture
     data = post(
         "https://httpbin.org/post",
-        files=[("file", (file_name, file_content, file_type))],
+        files=[FileField("file", FileInfo(file_name, file_content, file_type))],
     )
     data = json.loads(data)
     assert isinstance(data, dict)
@@ -70,10 +70,10 @@ def test_upload_multiple_files(qgis_new_project, file_fixture, another_file_fixt
     data = post(
         "https://httpbin.org/post",
         files=[
-            ("file", (file_name, file_content, file_type)),
-            (
+            FileField("file", FileInfo(file_name, file_content, file_type)),
+            FileField(
                 "another_file",
-                (another_file_name, another_file_content, another_file_type),
+                FileInfo(another_file_name, another_file_content, another_file_type),
             ),
         ],
     )
