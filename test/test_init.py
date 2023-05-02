@@ -32,7 +32,7 @@ def test_read_init():
     file_path = plugin_path("metadata.txt")
     metadata = []
     parser = configparser.ConfigParser()
-    parser.optionxform = str
+    parser.optionxform = str  # type: ignore[assignment,method-assign]
     parser.read(file_path, encoding="utf8")
     message = f'Cannot find a section named "general" in {file_path}'
     assert parser.has_section("general"), message
