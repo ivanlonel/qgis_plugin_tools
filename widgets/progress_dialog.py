@@ -3,7 +3,8 @@ __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
 
 import logging
-from typing import Callable, Optional, Union, cast
+from collections.abc import Callable
+from typing import Optional, Union, cast
 
 from qgis.core import QgsApplication, QgsTask
 from qgis.PyQt import uic

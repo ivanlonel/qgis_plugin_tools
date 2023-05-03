@@ -3,8 +3,9 @@ __license__ = "GPL version 2"
 __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable
+from typing import Any
 
 from .exceptions import QgsPluginException
 from .i18n import tr
