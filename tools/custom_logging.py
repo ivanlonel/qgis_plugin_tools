@@ -3,7 +3,7 @@
 import contextlib
 import functools
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from enum import Enum, unique
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -430,7 +430,7 @@ def teardown_logger(logger_name: str) -> None:
         teardown_logger(__name__.replace(".tools.custom_logging", "", 1))
 
 
-def teardown_loggers(logger_names: list[str]) -> None:
+def teardown_loggers(logger_names: Iterable[str]) -> None:
     """Remove the added handlers from the speficied handler."""
     for logger_name in logger_names:
         teardown_logger(logger_name)
