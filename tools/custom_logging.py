@@ -7,7 +7,7 @@ from collections.abc import Callable, Iterable
 from enum import Enum, unique
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Optional, TypedDict
+from typing import Any, Optional, Protocol, TypedDict, runtime_checkable
 
 from qgis.core import Qgis, QgsApplication, QgsMessageLog
 from qgis.gui import QgisInterface, QgsMessageBar
@@ -27,6 +27,13 @@ __revision__ = "$Format:%H$"
 class BarMsg(TypedDict, total=False):
     details: str
     success: bool
+    duration: int
+
+
+@runtime_checkable
+class HasQgsMessageBarFilterLogRecordAttributes(Protocol):
+    details: str
+    qgis_level: Qgis.MessageLevel
     duration: int
 
 
@@ -210,11 +217,12 @@ class QgsMessageBarHandler(logging.Handler):
         :param record: logging record enriched with extra information from
             QgsMessageBarFilter
         """
+        assert isinstance(record, HasQgsMessageBarFilterLogRecordAttributes)
         self._message_bar_proxy.emit_message(
             record.message,
-            record.details,  # type: ignore[attr-defined]
-            record.qgis_level,  # type: ignore[attr-defined]
-            record.duration,  # type: ignore[attr-defined]
+            record.details,
+            record.qgis_level,
+            record.duration,
         )
 
 
