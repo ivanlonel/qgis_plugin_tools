@@ -128,12 +128,11 @@ def set_project_setting(
     if internal:
         if isinstance(value, bool):
             return proj.writeEntryBool(plugin_name(), key, value)
-        else:
-            return (
-                proj.writeEntryDouble(plugin_name(), key, value)
-                if isinstance(value, float)
-                else proj.writeEntry(plugin_name(), key, value)
-            )
+        return (
+            proj.writeEntryDouble(plugin_name(), key, value)
+            if isinstance(value, float)
+            else proj.writeEntry(plugin_name(), key, value)
+        )
     QgsExpressionContextUtils.setProjectVariable(proj, key, value)
     return True
 
