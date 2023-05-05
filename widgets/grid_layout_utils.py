@@ -79,8 +79,7 @@ def _delete_child_widgets(item: QLayoutItem) -> None:
     :param item:
     :return:
     """
-    layout = item.layout()
-    if layout:
+    if layout := item.layout():
         for i in range(layout.count()):
             _delete_child_widgets(layout.itemAt(i))
         layout.deleteLater()

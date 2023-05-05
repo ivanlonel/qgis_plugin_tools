@@ -128,9 +128,12 @@ def set_project_setting(
     if internal:
         if isinstance(value, bool):
             return proj.writeEntryBool(plugin_name(), key, value)
-        if isinstance(value, float):
-            return proj.writeEntryDouble(plugin_name(), key, value)
-        return proj.writeEntry(plugin_name(), key, value)
+        else:
+            return (
+                proj.writeEntryDouble(plugin_name(), key, value)
+                if isinstance(value, float)
+                else proj.writeEntry(plugin_name(), key, value)
+            )
     QgsExpressionContextUtils.setProjectVariable(proj, key, value)
     return True
 
@@ -165,6 +168,4 @@ def parse_value(value: Union[QVariant, str]) -> Union[str, bool, None]:
         return None
     if str_value == "false":
         return False
-    if str_value == "true":
-        return True
-    return str_value
+    return True if str_value == "true" else str_value
