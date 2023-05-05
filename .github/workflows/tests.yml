@@ -20,9 +20,9 @@ jobs:
     strategy:
       matrix:
         qgis-image-tag:
-          - release-3_16
           - release-3_22
           - release-3_28
+          - latest
       fail-fast: false
 
     # Steps represent a sequence of tasks that will be executed as part of the job
