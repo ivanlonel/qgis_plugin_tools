@@ -5,6 +5,7 @@ __revision__ = "$Format:%H$"
 __date__ = "17/10/2010"
 __license__ = "GPL"
 __copyright__ = "Copyright 2012, Australia Indonesia Facility for Disaster Reduction"
+
 import configparser
 
 import pytest

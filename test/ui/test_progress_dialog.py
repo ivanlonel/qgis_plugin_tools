@@ -1,3 +1,7 @@
+__copyright__ = "Copyright 2021, qgis_plugin_tools contributors"
+__license__ = "GPL version 3"
+__email__ = "info@gispo.fi"
+
 import time
 
 import pytest
@@ -7,10 +11,6 @@ from qgis.PyQt.QtCore import QCoreApplication
 from ...testing.utilities import SimpleTask
 from ...tools.exceptions import TaskInterruptedException
 from ...widgets import progress_dialog
-
-__copyright__ = "Copyright 2021, qgis_plugin_tools contributors"
-__license__ = "GPL version 3"
-__email__ = "info@gispo.fi"
 
 
 @pytest.mark.parametrize("show_abort_btn", [True, False])

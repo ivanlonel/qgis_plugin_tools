@@ -1,12 +1,12 @@
-import logging
-from typing import Optional
-
-from qgis.core import QgsProcessingFeedback
-
 __copyright__ = "Copyright 2020-2021, Gispo Ltd"
 __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
+
+import logging
+from typing import Optional
+
+from qgis.core import QgsProcessingFeedback
 
 LOGGER = logging.getLogger(__name__)
 

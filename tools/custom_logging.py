@@ -1,5 +1,10 @@
 """Setting up logging using QGIS, file, Sentry..."""
 
+__copyright__ = "Copyright 2020-2021, Gispo Ltd"
+__license__ = "GPL version 3"
+__email__ = "info@gispo.fi"
+__revision__ = "$Format:%H$"
+
 import contextlib
 import functools
 import logging
@@ -25,11 +30,6 @@ from qgis.PyQt.QtWidgets import QLayout, QVBoxLayout, QWidget
 from .i18n import tr
 from .resources import plugin_name, plugin_path, profile_path
 from .settings import get_setting, setting_key
-
-__copyright__ = "Copyright 2020-2021, Gispo Ltd"
-__license__ = "GPL version 3"
-__email__ = "info@gispo.fi"
-__revision__ = "$Format:%H$"
 
 
 class BarMsg(TypedDict, total=False):
