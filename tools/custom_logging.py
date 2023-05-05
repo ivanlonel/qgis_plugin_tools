@@ -195,9 +195,7 @@ class QgsMessageBarFilter(logging.Filter):
             return 12
         if logging_level == "ERROR":
             return 10
-        if logging_level == "WARNING":
-            return 6
-        return 4
+        return 6 if logging_level == "WARNING" else 4
 
 
 class SimpleMessageBarProxy(QObject):
