@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import os
+import re
 import shutil
 import subprocess  # nosec: B404
 import sys
@@ -67,10 +68,10 @@ set TEMP_PATH=%PATH%
 call "%OSGEO4W_ROOT%"\bin\o4w_env.bat
 call "%OSGEO4W_ROOT%"\bin\qt5_env.bat
 call "%OSGEO4W_ROOT%"\bin\py3_env.bat
-call "%OSGEO4W_ROOT%"\apps\grass\grass78\etc\env.bat
+call "%OSGEO4W_ROOT%"\apps\grass\{grass_dir}\etc\env.bat
 path %QGIS_PREFIX_PATH%\bin;%PATH%
 path %PATH%;%OSGEO4W_ROOT%\apps\Qt5\bin
-path %PATH%;%OSGEO4W_ROOT%\apps\Python37\Scripts
+path %PATH%;%OSGEO4W_ROOT%\apps\{python_dir}\Scripts
 path %QGIS_PREFIX_PATH%\bin;%PATH%
 :: Add original PATH
 path %PATH%;%TEMP_PATH%
@@ -309,6 +310,16 @@ Put -h after command to see available optional arguments if any
             repository=ROOT_DIR,
             qgis_root=args.qgis_root,
             qgis_prefix_path=args.qgis_prefix_path,
+            grass_dir=next(
+                d
+                for d in os.listdir(os.path.join(args.qgis_root, "apps", "grass"))
+                if re.match(r"^grass\d+$", d)
+            ),
+            python_dir=next(
+                d
+                for d in os.listdir(os.path.join(args.qgis_root, "apps"))
+                if re.match(r"^Python\d+$", d)
+            ),
         )
 
         if args.save_to_disk:
