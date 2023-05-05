@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Any, Literal, Optional, TypeVar, Union, overload
 
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSettings
 from qgis.PyQt.QtCore import QVariant
@@ -135,18 +135,36 @@ def set_project_setting(
     return True
 
 
-def parse_value(value: Union[QVariant, str]) -> Union[None, str, bool]:
-    """
-    Parse QSettings value
+@overload
+def parse_value(value: Literal["NULL"]) -> None:
+    ...
+
+
+@overload
+def parse_value(value: Literal["false"]) -> Literal[False]:
+    ...
+
+
+@overload
+def parse_value(value: Literal["true"]) -> Literal[True]:
+    ...
+
+
+@overload
+def parse_value(value: Union[QVariant, str]) -> Union[str, bool, None]:
+    ...
+
+
+def parse_value(value: Union[QVariant, str]) -> Union[str, bool, None]:
+    """Parse QSettings value
 
     :param value: QVariant
     """
     str_value = str(value)
-    val: Union[None, str, bool] = str_value
-    if val == "NULL":
-        val = None
-    elif val == "false":
-        val = False
-    elif val == "true":
-        val = True
-    return val
+    if str_value == "NULL":
+        return None
+    if str_value == "false":
+        return False
+    if str_value == "true":
+        return True
+    return str_value
