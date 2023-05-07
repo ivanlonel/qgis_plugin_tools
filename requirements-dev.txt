@@ -66,6 +66,7 @@ flake8==6.0.0
     #   flake8-simplify
     #   flake8-tidy-imports
     #   flake8-use-fstring
+    #   flake8-useless-assert
     #   pep8-naming
     #   qgis-plugin-tools (pyproject.toml)
 flake8-2020==1.8.0
@@ -103,6 +104,8 @@ flake8-simplify==0.20.0
 flake8-tidy-imports==4.8.0
     # via qgis-plugin-tools (pyproject.toml)
 flake8-use-fstring==1.4
+    # via qgis-plugin-tools (pyproject.toml)
+flake8-useless-assert==0.4.4
     # via qgis-plugin-tools (pyproject.toml)
 gitdb==4.0.10
     # via gitpython

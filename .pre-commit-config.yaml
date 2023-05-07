@@ -92,6 +92,7 @@ repos:
           - flake8-simplify>=0.20.0
           - flake8-tidy-imports>=4.8.0
           - flake8-use-fstring>=1.4
+          - flake8-useless-assert>=0.4.4
           - pep8-naming>=0.13.3
 
   - repo: https://github.com/PyCQA/pylint
