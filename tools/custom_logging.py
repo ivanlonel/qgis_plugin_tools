@@ -243,7 +243,13 @@ class QgsMessageBarHandler(logging.Handler):
         :param record: logging record enriched with extra information from
             QgsMessageBarFilter
         """
-        assert isinstance(record, HasQgsMessageBarFilterLogRecordAttributes)
+        if not isinstance(record, HasQgsMessageBarFilterLogRecordAttributes):
+            raise ValueError(
+                "logging.LogRecord missing one or more of the following attributes: "
+                + ", ".join(
+                    vars(HasQgsMessageBarFilterLogRecordAttributes)["__annotations__"]
+                )
+            )
         self._message_bar_proxy.emit_message(
             record.message,
             record.details,

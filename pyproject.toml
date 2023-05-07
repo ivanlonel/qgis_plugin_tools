@@ -97,10 +97,8 @@ qgis_plugin_tools = "."
   "*.ui",
 ]
 
-[tool.bandit]
-skips = [
-  "B101",  # assert_used
-]
+[tool.bandit.assert_used]
+skips = ['*/test_*.py']
 
 [tool.black]
 line-length = 88
