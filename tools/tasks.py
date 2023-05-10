@@ -1,5 +1,6 @@
 import logging
-from typing import Any, Callable, Optional, Union
+from collections.abc import Callable
+from typing import Any, Optional, Union
 
 from qgis.core import QgsTask
 
@@ -22,7 +23,7 @@ class BaseTask(QgsTask):
     """
 
     def __init__(self) -> None:
-        super().__init__(self.name, QgsTask.CanCancel)
+        super().__init__(self.name, QgsTask.Flag.CanCancel)
         self.exception: Optional[Exception] = None
 
     @property
@@ -35,8 +36,7 @@ class BaseTask(QgsTask):
 
         :return: whether task finished successfully or not.
         """
-
-        LOGGER.debug(f"Started task {self.name}")
+        LOGGER.debug("Started task %s", self.name)
         try:
             self._check_if_canceled()
             return self._run()
@@ -55,8 +55,9 @@ class BaseTask(QgsTask):
         """
         if result:
             LOGGER.debug(
-                f"Task {self.name} ended successfully in "
-                f"{self.elapsedTime() / 1000:.2f}!"
+                "Task %s ended successfully in %.2f!",
+                self.name,
+                self.elapsedTime() / 1000,
             )
         elif self.exception is None:
             MsgBar.warning(
@@ -68,7 +69,7 @@ class BaseTask(QgsTask):
                 raise self.exception
             except QgsPluginException as e:
                 MsgBar.exception(str(e), **e.bar_msg)
-            except Exception as e:
+            except Exception as e:  # noqa: PIE786
                 MsgBar.exception(tr("Unhandled exception occurred"), e)
 
     def setProgress(self, progress: Union[int, float]) -> None:  # noqa: N802
@@ -96,9 +97,7 @@ class BaseTask(QgsTask):
 
 
 class FunctionTask(BaseTask):
-    """
-    Utility class for creating a task out of a function.
-    """
+    """Utility class for creating a task out of a function."""
 
     def __init__(self, callback_function: Callable) -> None:
         super().__init__()

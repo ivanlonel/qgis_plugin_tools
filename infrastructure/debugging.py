@@ -1,4 +1,3 @@
-# flake8: noqa E501
 __copyright__ = "Copyright 2020-2021, Gispo Ltd"
 __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
@@ -7,6 +6,10 @@ __revision__ = "$Format:%H$"
 import os
 import shutil
 import sys
+
+from qgis.core import QgsMessageLog
+
+from ..tools.resources import plugin_name
 
 
 def _check_if_should_setup() -> bool:
@@ -39,16 +42,18 @@ def setup_pydevd(host: str = "localhost", port: int = 5678) -> bool:
     :param host: host of the debug server
     :param port: port of the debug server
     :return: Whether debugger was initialized properly or not
-    """
+    """  # noqa: B950
     succeeded = False
     if _check_if_should_setup():
         try:
-            import pydevd
+            import pydevd  # pylint: disable=import-outside-toplevel
 
             pydevd.settrace(host, port=port, stdoutToServer=True, stderrToServer=True)
             succeeded = True
-        except Exception as e:
-            print(f"Unable to create pydevd debugger: {e}")
+        except Exception as e:  # noqa: PIE786
+            QgsMessageLog.logMessage(
+                f"Unable to create pydevd debugger: {e}", tag=plugin_name()
+            )
 
     return succeeded
 
@@ -83,16 +88,18 @@ def setup_ptvsd(host: str = "localhost", port: int = 5678) -> bool:
     :param host: host of the debug server
     :param port: port of the debug server
     :return: Whether debugger was initialized properly or not
-    """
+    """  # noqa: B950
     succeeded = False
     if _check_if_should_setup():
         try:
-            import ptvsd
+            import ptvsd  # pylint: disable=import-outside-toplevel
 
             ptvsd.enable_attach((host, port))
             succeeded = True
-        except Exception as e:
-            print(f"Unable to create ptvsd debugger: {e}")
+        except Exception as e:  # noqa: PIE786
+            QgsMessageLog.logMessage(
+                f"Unable to create ptvsd debugger: {e}", tag=plugin_name()
+            )
     return succeeded
 
 
@@ -126,17 +133,19 @@ def setup_debugpy(host: str = "localhost", port: int = 5678) -> bool:
     :param host: host of the debug server
     :param port: port of the debug server
     :return: Whether debugger was initialized properly or not
-    """
+    """  # noqa: B950
     succeeded = False
     if _check_if_should_setup() and not os.environ.get("QGIS_DEBUGPY_HAS_LOADED"):
         try:
-            import debugpy
+            import debugpy  # pylint: disable=import-outside-toplevel
 
             debugpy.configure(python=shutil.which("python"))
             debugpy.listen((host, port))
             succeeded = True
-        except Exception as e:
-            print(f"Unable to create debugpy debugger: {e}")
+        except Exception as e:  # noqa: PIE786
+            QgsMessageLog.logMessage(
+                f"Unable to create debugpy debugger: {e}", tag=plugin_name()
+            )
         else:
             # extra guard for debugpy not to setup it twice
             # (causes debugging session to hang)

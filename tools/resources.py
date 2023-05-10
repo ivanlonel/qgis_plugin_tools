@@ -1,15 +1,5 @@
 """Tools to work with resource files."""
 
-import configparser
-import importlib.resources
-import sys
-from os.path import abspath, dirname, exists, join, pardir
-from pathlib import Path
-from typing import Dict, Optional
-
-from qgis.PyQt import uic
-from qgis.PyQt.QtWidgets import QDialog, QWidget
-
 __copyright__ = (
     "Copyright 2019, 3Liz, 2020-2021 Gispo Ltd, 2022 National Land Survey of Finland"
 )
@@ -17,7 +7,17 @@ __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 __revision__ = "$Format:%H$"
 
+import configparser
+import importlib.resources
+import inspect
+import sys
+from os.path import abspath, dirname, exists, join, pardir
+from pathlib import Path
+from typing import Optional
+
 from qgis.core import QgsApplication
+from qgis.PyQt import uic
+from qgis.PyQt.QtWidgets import QDialog, QWidget
 
 PLUGIN_NAME: str = ""
 SLUG_NAME: str = ""
@@ -49,7 +49,6 @@ def _plugin_path_dependency() -> str:
     # relative to the calling modules top level package name
     # probably inefficient, but if the runtime is not a dependency
     # but a subtree instead this might not need any optimizations?
-    import inspect
 
     for frame_info in inspect.stack():
         module_name: Optional[str] = frame_info.frame.f_globals.get("__name__")
@@ -119,15 +118,13 @@ def plugin_name() -> str:
     :return: The stripped plugin name.
     :rtype: basestring
     """
-    global PLUGIN_NAME, _IS_SUBMODULE_USAGE
+    global PLUGIN_NAME  # pylint: disable=global-statement
 
     if PLUGIN_NAME != "":
         return PLUGIN_NAME
 
     try:
-        metadata = metadata_config()
-        name: str = metadata["general"]["name"]
-        name = name.replace(" ", "").strip()
+        name: str = metadata_config()["general"]["name"].replace(" ", "").strip()
     except KeyError:
         name = "test_plugin"
 
@@ -147,23 +144,20 @@ def plugin_display_name() -> str:
     :rtype: basestring
     """
     try:
-        metadata = metadata_config()
-        return metadata["general"]["name"]
+        return metadata_config()["general"]["name"]
     except KeyError:
         return "Test plugin"
 
 
 def slug_name() -> str:
     """Return project slug name in .qgis-plugin.ci"""
-    global SLUG_NAME, _IS_SUBMODULE_USAGE
+    global SLUG_NAME  # pylint: disable=global-statement
 
     if SLUG_NAME != "":
         return SLUG_NAME
 
     try:
-        metadata = metadata_config()
-        name: str = metadata["general"]["repository"]
-        slug = name.split("/")[-1]
+        slug: str = metadata_config()["general"]["repository"].split("/")[-1]
     except KeyError:
         slug = plugin_name()
 
@@ -176,9 +170,7 @@ def slug_name() -> str:
 
 
 def task_logger_name() -> str:
-    """
-    Returns the name for task logger
-    """
+    """Returns the name for task logger"""
     return f"{plugin_name()}_task"
 
 
@@ -190,26 +182,30 @@ def metadata_config() -> configparser.ConfigParser:
     """
     path = plugin_path("metadata.txt")
     config = configparser.ConfigParser()
-    config.read(path)
+    config.read(path, encoding="utf8")
     return config
 
 
-def qgis_plugin_ci_config() -> Optional[Dict]:
-    """
-    Get configuration of the ci config or None
-    """
+def qgis_plugin_ci_config() -> Optional[dict]:
+    """Get configuration of the ci config or None"""
     path_str = root_path(".qgis-plugin-ci")
     if not Path(path_str).exists():
         path_str = plugin_path(".qgis-plugin-ci")
     path = Path(path_str)
     if path.exists():
-        with open(path) as f:
+        with open(path, encoding="utf8") as f:
             config = {}
             for line in f:
                 parts = line.split(":")
                 config[parts[0]] = ":".join(parts[1:])
 
         return config
+
+    parser = configparser.ConfigParser()
+    parser.read((root_path("setup.cfg"), plugin_path("setup.cfg")), encoding="utf8")
+    if "qgis-plugin-ci" in parser.sections():
+        return dict(parser.items("qgis-plugin-ci"))
+
     return None
 
 
@@ -222,7 +218,6 @@ def plugin_test_data_path(*args: str) -> str:
     :return: Absolute path to the resources folder.
     :rtype: str
     """
-
     path = abspath(abspath(join(root_path(), "test", "data")))
     if not exists(path):
         path = abspath(abspath(join(plugin_path(), "test", "data")))
@@ -265,10 +260,10 @@ def load_ui(*args: str) -> QWidget:
     return ui_class
 
 
-def ui_file_dialog(*ui_file_name_parts: str):  # noqa ANN201
+def ui_file_dialog(*ui_file_name_parts: str) -> type[QDialog]:
     """DRY helper for building classes from a .ui file"""
 
-    class UiFileDialogClass(QDialog, load_ui(*ui_file_name_parts)):  # type: ignore
+    class UiFileDialogClass(QDialog, load_ui(*ui_file_name_parts)):  # type: ignore[misc]
         def __init__(
             self,
             parent: Optional[QWidget],
@@ -289,7 +284,6 @@ def package_file(package: importlib.resources.Package, file_name: str) -> Path:
     Use like importlib.resources, provide a package (module or string)
     and file name/path inside the package.
     """
-
     with importlib.resources.as_file(
         importlib.resources.files(package).joinpath(file_name)
     ) as requested_path:

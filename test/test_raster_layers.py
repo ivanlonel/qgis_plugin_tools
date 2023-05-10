@@ -1,3 +1,4 @@
+# pylint: disable=redefined-outer-name
 __copyright__ = "Copyright 2020-2021, Gispo Ltd"
 __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
@@ -18,24 +19,24 @@ from ..tools.raster_layers import (
 )
 
 
-@pytest.fixture
+@pytest.fixture()
 def netcdf_layer(tmpdir) -> QgsRasterLayer:
     path = download_to_file(
-        "https://raw.githubusercontent.com/GispoCoding/FMI2QGIS/master/FMI2QGIS/test/data/aq_small.nc",  # noqa E501
+        "https://raw.githubusercontent.com/GispoCoding/FMI2QGIS/master/FMI2QGIS/test/data/aq_small.nc",  # noqa: E501
         tmpdir,
     )
     return QgsRasterLayer(str(path))
 
 
-@pytest.fixture
+@pytest.fixture()
 def t_range() -> QgsDateTimeRange:
     return QgsDateTimeRange(
         QDateTime(2020, 11, 2, 15, 0, 0, 0), QDateTime(2020, 11, 3, 11, 0, 0, 0)
     )
 
 
-@pytest.fixture
-def configured_layer(netcdf_layer, t_range) -> QgsRasterLayer:
+@pytest.fixture()
+def configured_layer(netcdf_layer: QgsRasterLayer, t_range) -> QgsRasterLayer:
     set_raster_renderer_to_singleband(netcdf_layer)
     set_fixed_temporal_range(netcdf_layer, t_range)
     return netcdf_layer

@@ -1,4 +1,9 @@
-from typing import Type, Union
+__copyright__ = "Copyright 2020-2021, Gispo Ltd"
+__license__ = "GPL version 3"
+__email__ = "info@gispo.fi"
+__revision__ = "$Format:%H$"
+
+from typing import Union, cast
 
 from qgis.core import QgsApplication, QgsFields
 from qgis.gui import QgsDateTimeEdit, QgsDoubleSpinBox, QgsSpinBox
@@ -6,88 +11,68 @@ from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QCheckBox, QComboBox, QDateEdit, QWidget
 
-__copyright__ = "Copyright 2020-2021, Gispo Ltd"
-__license__ = "GPL version 3"
-__email__ = "info@gispo.fi"
-__revision__ = "$Format:%H$"
-
 
 # noinspection PyCallByClass,PyArgumentList
 def variant_type_icon(field_type: QVariant) -> QIcon:
-    if field_type == QVariant.Bool:
-        return QgsApplication.getThemeIcon("/mIconFieldBool.svg")
-    elif field_type in [
-        QVariant.Int,
-        QVariant.UInt,
-        QVariant.LongLong,
-        QVariant.ULongLong,
-    ]:
-        return QgsApplication.getThemeIcon("/mIconFieldInteger.svg")
-    elif field_type == QVariant.Double:
-        return QgsApplication.getThemeIcon("/mIconFieldFloat.svg")
-    elif field_type == QVariant.String:
-        return QgsApplication.getThemeIcon("/mIconFieldText.svg")
-    elif field_type == QVariant.Date:
-        return QgsApplication.getThemeIcon("/mIconFieldDate.svg")
-    elif field_type == QVariant.DateTime:
-        return QgsApplication.getThemeIcon("/mIconFieldDateTime.svg")
-    elif field_type == QVariant.Time:
-        return QgsApplication.getThemeIcon("/mIconFieldTime.svg")
-    elif field_type == QVariant.ByteArray:
-        return QgsApplication.getThemeIcon("/mIconFieldBinary.svg")
-    else:
-        return QIcon()
+    type_icons = {
+        QVariant.Type.Bool: "/mIconFieldBool.svg",
+        QVariant.Type.Int: "/mIconFieldInteger.svg",
+        QVariant.Type.UInt: "/mIconFieldInteger.svg",
+        QVariant.Type.LongLong: "/mIconFieldInteger.svg",
+        QVariant.Type.ULongLong: "/mIconFieldInteger.svg",
+        QVariant.Type.Double: "/mIconFieldFloat.svg",
+        QVariant.Type.String: "/mIconFieldText.svg",
+        QVariant.Type.Date: "/mIconFieldDate.svg",
+        QVariant.Type.DateTime: "/mIconFieldTime.svg",
+        QVariant.Type.Time: "/mIconFieldTime.svg",
+        QVariant.Type.ByteArray: "/mIconFieldBinary.svg",
+    }
+    file_name = type_icons.get(field_type)
+    return QIcon() if file_name is None else QgsApplication.getThemeIcon(file_name)
 
 
 def widget_for_field(field_type: QVariant) -> QWidget:
-    q_combo_box = QComboBox()
-    q_combo_box.setEditable(True)
-
-    if field_type == QVariant.Bool:
+    if field_type == QVariant.Type.Bool:
         return QCheckBox()
-    elif field_type in [
-        QVariant.Int,
-        QVariant.UInt,
-        QVariant.LongLong,
-        QVariant.ULongLong,
-    ]:
+    if field_type in {
+        QVariant.Type.Int,
+        QVariant.Type.UInt,
+        QVariant.Type.LongLong,
+        QVariant.Type.ULongLong,
+    }:
         spin_box = QgsSpinBox()
         spin_box.setMaximum(2147483647)
         return spin_box
-    elif field_type == QVariant.Double:
-        spin_box = QgsDoubleSpinBox()
-        spin_box.setMaximum(2147483647)
-        return spin_box
-    elif field_type == QVariant.String:
-        return q_combo_box
-    elif field_type == QVariant.Date:
+    if field_type == QVariant.Type.Double:
+        double_spin_box = QgsDoubleSpinBox()
+        double_spin_box.setMaximum(2147483647)
+        return double_spin_box
+    if field_type == QVariant.Type.Date:
         return QDateEdit()
-    elif field_type == QVariant.DateTime:
+    if field_type in {QVariant.Type.DateTime, QVariant.Type.Time}:
         return QgsDateTimeEdit()
-    elif field_type == QVariant.Time:
-        return QgsDateTimeEdit()
-    elif field_type == QVariant.ByteArray:
-        return q_combo_box
-    else:
-        return q_combo_box
+
+    # QVariant.Type.ByteArray, QVariant.Type.String or other
+    q_combo_box = QComboBox()
+    q_combo_box.setEditable(True)
+    return q_combo_box
 
 
-def value_for_widget(widget: Type[QWidget]) -> Union[str, bool, float, int]:
+def value_for_widget(widget: QWidget) -> Union[str, bool, float, int]:
     if isinstance(widget, QComboBox):
-        return widget.currentText()
-    elif isinstance(widget, QCheckBox):
-        return widget.isChecked()
-    elif isinstance(widget, QgsDateTimeEdit):
+        return cast(str, widget.currentText())
+    if isinstance(widget, QCheckBox):
+        return cast(bool, widget.isChecked())
+    if isinstance(widget, QgsDateTimeEdit):
         return widget.dateTime().toString("yyyy-MM-dd hh:mm:ss")
-    elif isinstance(widget, (QgsSpinBox, QgsDoubleSpinBox)):
+    if isinstance(widget, (QgsSpinBox, QgsDoubleSpinBox)):
         return widget.value()
-    else:
-        return str(widget.text())
+    return str(widget.text())
 
 
 def provider_fields(fields: QgsFields) -> QgsFields:
     flds = QgsFields()
     for i in range(fields.count()):
-        if fields.fieldOrigin(i) == QgsFields.OriginProvider:
+        if fields.fieldOrigin(i) == QgsFields.FieldOrigin.OriginProvider:
             flds.append(fields.at(i))
     return flds

@@ -1,25 +1,26 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# flake8: noqa
-import argparse
-import os
-import shutil
-import subprocess
-import sys
-from argparse import ArgumentParser
-from pathlib import Path
-from typing import List
-from zipfile import ZipFile
-
-from ..tools.resources import plugin_name, plugin_path, resources_path
 
 __copyright__ = "Copyright 2020-2021, Gispo Ltd"
 __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
+import argparse
+import os
+import re
+import shutil
+import subprocess  # nosec: B404
+import sys
+from argparse import ArgumentParser
+from collections.abc import Iterable, Sequence
+from pathlib import Path
+from typing import Any, Optional, Union
+from zipfile import ZipFile
 
-def is_windows():
+from ..tools.resources import plugin_name, plugin_path, resources_path
+
+
+def is_windows() -> bool:
     return "win" in sys.platform and "darwin" not in sys.platform
 
 
@@ -31,7 +32,7 @@ ROOT_DIR = str(Path(__file__).parent.parent.parent.parent.resolve())
 SUBMODULES = ["qgis_plugin_tools"]
 
 # Add files for any locales you want to support here
-LOCALES: List[str] = []
+LOCALES: list[str] = []
 
 # If locales are enabled, set the name of the lrelease binary on your system. If
 # you have trouble compiling the translations, you may have to specify the full path to
@@ -44,7 +45,7 @@ PYRCC = "pyrcc5"
 PROFILE = "default"
 
 # Resource files
-RESOURCES_SRC: List[str] = []
+RESOURCES_SRC: list[str] = []
 
 EXTRAS = ["metadata.txt"]
 
@@ -54,11 +55,9 @@ COMPILED_RESOURCE_FILES = ["resources.py"]
 
 VENV_NAME = ".venv"
 
-"""
 #################################################
 # Normally you would not need to edit below here
 #################################################
-"""
 
 STARTUP_BAT = r"""
 @echo off
@@ -70,10 +69,10 @@ set TEMP_PATH=%PATH%
 call "%OSGEO4W_ROOT%"\bin\o4w_env.bat
 call "%OSGEO4W_ROOT%"\bin\qt5_env.bat
 call "%OSGEO4W_ROOT%"\bin\py3_env.bat
-call "%OSGEO4W_ROOT%"\apps\grass\grass78\etc\env.bat
+call "%OSGEO4W_ROOT%"\apps\grass\{grass_dir}\etc\env.bat
 path %QGIS_PREFIX_PATH%\bin;%PATH%
 path %PATH%;%OSGEO4W_ROOT%\apps\Qt5\bin
-path %PATH%;%OSGEO4W_ROOT%\apps\Python37\Scripts
+path %PATH%;%OSGEO4W_ROOT%\apps\{python_dir}\Scripts
 path %QGIS_PREFIX_PATH%\bin;%PATH%
 :: Add original PATH
 path %PATH%;%TEMP_PATH%
@@ -115,7 +114,7 @@ else:
 VERBOSE = False
 
 
-def echo(*args, **kwargs):
+def echo(*args: Any, **kwargs: Any) -> None:
     if VERBOSE or kwargs.get("force", False):
         print(*args)
 
@@ -123,27 +122,31 @@ def echo(*args, **kwargs):
 class PluginMaker:
     def __init__(
         self,
-        py_files,
-        ui_files,
-        resources=RESOURCES_SRC,
-        extra_dirs=EXTRA_DIRS,
-        extras=EXTRAS,
-        compiled_resources=COMPILED_RESOURCE_FILES,
-        locales=LOCALES,
-        profile=PROFILE,
-        lrelease=LRELEASE,
-        pyrcc=PYRCC,
-        verbose=VERBOSE,
-        submodules=SUBMODULES,
-    ):
-        global VERBOSE
+        py_files: list[str],
+        ui_files: list[str],
+        resources: Optional[list[str]] = None,
+        extra_dirs: Optional[list[str]] = None,
+        extras: Optional[list[str]] = None,
+        compiled_resources: Optional[list[str]] = None,
+        locales: Optional[list[str]] = None,
+        profile: str = PROFILE,
+        lrelease: str = LRELEASE,
+        pyrcc: str = PYRCC,
+        verbose: bool = False,
+        submodules: Optional[list[str]] = None,
+    ) -> None:
+        global VERBOSE  # pylint: disable=global-statement
         self.py_files = py_files
         self.ui_files = ui_files
-        self.resources = resources
-        self.extra_dirs = extra_dirs
-        self.extras = extras
-        self.compiled_resources = compiled_resources
-        self.locales = locales
+        self.resources = resources if resources is not None else RESOURCES_SRC
+        self.extra_dirs = extra_dirs if extra_dirs is not None else EXTRA_DIRS
+        self.extras = extras if extras is not None else EXTRAS
+        self.compiled_resources = (
+            compiled_resources
+            if compiled_resources is not None
+            else COMPILED_RESOURCE_FILES
+        )
+        self.locales = locales if locales is not None else LOCALES
         self.profile = profile
         self.lrelease = lrelease
         self.pyrcc = pyrcc
@@ -151,10 +154,10 @@ class PluginMaker:
         self.plugin_dir = os.path.join(
             str(Path.home()), self.qgis_dir, "python", "plugins", PLUGIN_PACKAGE_NAME
         )
-        self.submodules = submodules
+        self.submodules = submodules if submodules is not None else SUBMODULES
         VERBOSE = verbose
 
-        # git-like usage https://chase-seibert.github.io/blog/2014/03/21/python-multilevel-argparse.html # noqa
+        # git-like usage https://chase-seibert.github.io/blog/2014/03/21/python-multilevel-argparse.html
         usage = f"""build.py <command> [<args>]
 Commands:
      clean          Cleans resources
@@ -174,18 +177,18 @@ Put -h after command to see available optional arguments if any
         args = parser.parse_args(sys.argv[1:2])
         if not hasattr(self, args.command):
             parser.print_help()
-            exit(1)
+            sys.exit(1)
 
         # use dispatch pattern to invoke method with same name
         getattr(self, args.command)()
 
-    def clean(self):
+    def clean(self) -> None:
         for fil in self.compiled_resources:
             if os.path.exists(fil):
                 echo(f"rm {fil}")
                 os.remove(fil)
 
-    def compile(self):
+    def compile(self) -> None:  # noqa: A003
         pre_args = self._get_platform_args()
         for fil in self.resources:
             if os.path.exists(fil):
@@ -194,25 +197,25 @@ Put -h after command to see available optional arguments if any
             else:
                 raise ValueError(f"The expected resource file {fil} is missing!")
 
-    def _get_platform_args(self):
-        return ["cmd", "/c"] if is_windows() else []  # noqa W605
+    def _get_platform_args(self) -> list[str]:
+        return ["cmd", "/c"] if is_windows() else []
 
-    def deploy(self):
+    def deploy(self) -> None:
         self.compile()
         dst_dir = f"{self.plugin_dir}/"
         os.makedirs(self.plugin_dir, exist_ok=True)
-        for dr in self.extra_dirs:
-            echo(f"cp -R --parents {dr} {dst_dir}")
-            dst = os.path.join(self.plugin_dir, dr)
+        for extra_dir in self.extra_dirs:
+            echo(f"cp -R --parents {extra_dir} {dst_dir}")
+            dst = os.path.join(self.plugin_dir, extra_dir)
             if os.path.exists(dst):
                 shutil.rmtree(dst)
-            shutil.copytree(dr, dst)
+            shutil.copytree(extra_dir, dst)
         self.cp_parents(dst_dir, self.extras)
         self.cp_parents(dst_dir, self.compiled_resources)
         self.cp_parents(dst_dir, self.py_files)
         self.cp_parents(dst_dir, self.ui_files)
 
-    def package(self):
+    def package(self) -> None:
         parser = ArgumentParser()
         parser.add_argument(
             "--version",
@@ -230,7 +233,7 @@ Put -h after command to see available optional arguments if any
         if args.version is None:
             echo("Give valid version number", force=True)
             parser.print_help()
-            exit(1)
+            sys.exit(1)
 
         if args.tag:
             self.run_command(self._get_platform_args() + ["git", "tag", args.version])
@@ -263,7 +266,7 @@ Put -h after command to see available optional arguments if any
         self.join_zips(zips)
         echo(f"Created package: {PLUGINNAME}.zip")
 
-    def start_ide(self):
+    def start_ide(self) -> None:
         if not is_windows():
             print(
                 "This command is only meant to run on Windows environment with QGIS < 3.16.8."
@@ -308,27 +311,37 @@ Put -h after command to see available optional arguments if any
             repository=ROOT_DIR,
             qgis_root=args.qgis_root,
             qgis_prefix_path=args.qgis_prefix_path,
+            grass_dir=next(
+                d
+                for d in os.listdir(os.path.join(args.qgis_root, "apps", "grass"))
+                if re.match(r"^grass\d+$", d)
+            ),
+            python_dir=next(
+                d
+                for d in os.listdir(os.path.join(args.qgis_root, "apps"))
+                if re.match(r"^Python\d+$", d)
+            ),
         )
 
         if args.save_to_disk:
-            with open(Path(ROOT_DIR) / "start_ide.bat", "w") as f:
+            with open(Path(ROOT_DIR) / "start_ide.bat", "w", encoding="utf8") as f:
                 f.write(script)
                 print(
                     f"Script saved successfully to {f.name}. "
                     f"You can move the file whenever you want."
                 )
         else:
-            process = subprocess.Popen(
+            with subprocess.Popen(  # nosec: B607
                 "cmd.exe",
-                shell=False,
+                shell=False,  # nosec: B603
                 universal_newlines=True,
                 stdin=subprocess.PIPE,
                 stdout=sys.stdout,
                 stderr=sys.stderr,
-            )
-            process.communicate(script)
+            ) as process:
+                process.communicate(script)
 
-    def transup(self):
+    def transup(self) -> None:
         files_to_translate = self.py_files + self.ui_files
         for locale in self.locales:
             ts_file = os.path.join(resources_path("i18n"), f"{locale}.ts")
@@ -340,7 +353,7 @@ Put -h after command to see available optional arguments if any
             )
             self.run_command(args, force_show_output=True)
 
-    def transcompile(self):
+    def transcompile(self) -> None:
         pre_args = self._get_platform_args()
         for locale in self.locales:
             fil = os.path.join(resources_path("i18n"), f"{locale}.ts")
@@ -348,21 +361,20 @@ Put -h after command to see available optional arguments if any
             args = pre_args + [self.lrelease, fil]
             self.run_command(args, force_show_output=True)
 
-    def venv(self):
+    def venv(self) -> None:
         try:
-            from qgis.core import QgsVectorLayer
+            # pylint: disable-next=unused-import,import-outside-toplevel
+            from qgis.core import QgsVectorLayer  # noqa: F401
         except ImportError:
             print("Your python environment has no access to QGIS libraries!")
             return
 
+        env = os.environ.copy()
         if is_windows():
-            env = os.environ.copy()
             env["PATH"] += (
-                f';{os.path.join(os.path.expanduser("~"), "AppData", "Local", "Programs", "Git", "cmd")}'
+                f';{os.path.join(env["LOCALAPPDATA"], "Programs", "Git", "cmd")}'
                 ";C:\\Program Files\\Git\\cmd"
             )
-        else:
-            env = os.environ
 
         print("Installing virtual environment")
         requirements = os.path.join(ROOT_DIR, "requirements-dev.txt")
@@ -386,33 +398,37 @@ Put -h after command to see available optional arguments if any
             requirements=requirements,
         )
 
-        process = subprocess.Popen(
+        with subprocess.Popen(
             "cmd.exe" if is_windows() else "sh",
-            shell=False,
+            shell=False,  # nosec: B603
             universal_newlines=True,
             stdin=subprocess.PIPE,
             stdout=sys.stdout,
             stderr=sys.stderr,
             env=env,
-        )
-        process.communicate(script)
+        ) as process:
+            process.communicate(script)
 
     @staticmethod
-    def run_command(args, d=None, force_show_output=False):
+    def run_command(
+        args: Sequence[str],
+        d: Optional[Union[str, os.PathLike[str]]] = None,
+        force_show_output: bool = False,
+    ) -> None:
         cmd = " ".join(args)
         if d is not None:
             cmd = f"cd {d} && {cmd}"
         echo(cmd, force=force_show_output)
-        pros = subprocess.Popen(
+        with subprocess.Popen(  # nosec: B603
             args,
             cwd=d,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
-        )
-        stdout, stderr = pros.communicate()
+        ) as pros:
+            stdout, stderr = pros.communicate()
         echo(stdout, force=force_show_output)
-        if len(stderr):
+        if stderr:
             echo(stderr, force=True)
             print(
                 "------beging of stderr----------:\n",
@@ -422,22 +438,25 @@ Put -h after command to see available optional arguments if any
             raise ValueError("Stopping now due to error in stderr!")
 
     @staticmethod
-    def cp_parents(target_dir, files):
+    def cp_parents(
+        target_dir: Union[str, os.PathLike[str]],
+        files: Iterable[Union[str, os.PathLike[str]]],
+    ) -> None:
         """https://stackoverflow.com/a/15340518"""
         dirs = [os.path.dirname(file) for file in files]
         dirs.sort(reverse=True)
-        for i in range(len(dirs)):
+        for i in range(len(dirs)):  # pylint: disable=consider-using-enumerate
             if dirs[i] + os.sep not in dirs[i - 1]:
-                need_dir = os.path.normpath(target_dir + dirs[i])
+                need_dir = os.path.normpath(os.path.join(target_dir, dirs[i]))
                 echo("mkdir", need_dir)
                 os.makedirs(need_dir, exist_ok=True)
         for file in files:
-            dest = os.path.normpath(target_dir + file)
+            dest = os.path.normpath(os.path.join(target_dir, file))
             echo(f"cp {file} {dest}")
             shutil.copy(file, dest)
 
     @staticmethod
-    def join_zips(zips):
+    def join_zips(zips: Sequence) -> None:
         """
         https://stackoverflow.com/a/10593823/10068922
 
@@ -446,6 +465,7 @@ Put -h after command to see available optional arguments if any
         """
         with ZipFile(zips[0], "a") as z1:
             for fname in zips[1:]:
-                zf = ZipFile(fname, "r")
-                for n in zf.namelist():
-                    z1.writestr(n, zf.open(n).read())
+                with ZipFile(fname, "r") as zf:
+                    for n in zf.namelist():
+                        with zf.open(n) as fd:
+                            z1.writestr(n, fd.read())

@@ -1,10 +1,23 @@
-from typing import Any, Optional, Union
+from collections.abc import Iterable
+from typing import TYPE_CHECKING, Any, Literal, Optional, TypeVar, Union, overload
 
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSettings
 from qgis.PyQt.QtCore import QVariant
 
 from .exceptions import QgsPluginInvalidProjectSetting
 from .resources import plugin_name
+
+if TYPE_CHECKING:
+    from typing import TypedDict
+
+    from typing_extensions import NotRequired
+
+    class QgsSettingsValueKeywordArgs(TypedDict):
+        section: QgsSettings.Section
+        type: NotRequired[type]  # noqa: A003
+
+
+T = TypeVar("T", str, int, float, bool, list)
 
 
 def setting_key(*args: str) -> str:
@@ -18,10 +31,10 @@ def setting_key(*args: str) -> str:
 
 def get_setting(
     key: str,
-    default: Optional[Any] = None,
+    default: Any = None,
     typehint: Optional[type] = None,
     internal: bool = True,
-    section: int = QgsSettings.NoSection,
+    section: QgsSettings.Section = QgsSettings.Section.NoSection,
 ) -> Union[QVariant, str]:
     """
     Get QGIS setting value plugin
@@ -33,20 +46,19 @@ def get_setting(
     :param section: Section argument can be used to get a value from
     a specific Section.
     """
-    s = QgsSettings()
-    kwargs = {"defaultValue": default, "section": section}
-
+    kwargs: "QgsSettingsValueKeywordArgs" = {"section": section}
     if typehint is not None:
         kwargs["type"] = typehint
-    return s.value(setting_key(key) if internal else key, **kwargs)
+
+    return QgsSettings().value(setting_key(key) if internal else key, default, **kwargs)
 
 
 def set_setting(
     key: str,
     value: Union[str, int, float, bool],
     internal: bool = True,
-    section: int = QgsSettings.NoSection,
-) -> bool:
+    section: QgsSettings.Section = QgsSettings.Section.NoSection,
+) -> None:
     """
     Set a value in the QgsSetting
 
@@ -55,18 +67,16 @@ def set_setting(
     :param internal: Whether to search from only plugin settings or all
     :param section: Section argument can be used to set a value to a specific Section
     """
-    qs = QgsSettings()
-    return qs.setValue(setting_key(key) if internal else key, value, section)
+    QgsSettings().setValue(setting_key(key) if internal else key, value, section)
 
 
 def get_project_setting(
     key: str,
-    default: Optional[Any] = None,
-    typehint: Optional[type] = None,
+    default: Union[T, QVariant, None] = None,
+    typehint: Optional[type[T]] = None,
     internal: bool = True,
-) -> Union[QVariant, str, None]:
-    """
-    Get QGIS project setting value
+) -> Union[T, QVariant, str, None]:
+    """Get QGIS project setting value
 
     :param key: Key for the setting
     :param default: Optional default value
@@ -80,29 +90,32 @@ def get_project_setting(
         value = QgsExpressionContextUtils.projectScope(proj).variable(key)
         return value if value is not None else default
 
-    args = [plugin_name(), key]
-    if default is not None:
-        args.append(default)
+    args: Union[tuple[()], tuple[T]] = () if default is None else (default,)
 
-    value = None
-    conversion_ok = False
-    if typehint is not None and typehint is not str:
-        try:
-            if typehint is int:
-                value, conversion_ok = proj.readNumEntry(*args)
-            elif typehint is bool:
-                value, conversion_ok = proj.readBoolEntry(*args)
-            elif typehint is list:
-                value, conversion_ok = proj.readListEntry(*args)
-        except TypeError as e:
-            raise QgsPluginInvalidProjectSetting(str(e))
-    else:
-        value, conversion_ok = proj.readEntry(*args)
+    try:
+        if typehint is None or typehint is str:
+            value, conversion_ok = proj.readEntry(plugin_name(), key, *args)
+        elif typehint is int:
+            value, conversion_ok = proj.readNumEntry(plugin_name(), key, *args)
+        elif typehint is float:
+            value, conversion_ok = proj.readDoubleEntry(plugin_name(), key, *args)
+        elif typehint is bool:
+            value, conversion_ok = proj.readBoolEntry(plugin_name(), key, *args)
+        elif typehint is list:
+            value, conversion_ok = proj.readListEntry(plugin_name(), key, *args)
+        else:
+            raise QgsPluginInvalidProjectSetting(
+                "If specified, typehint must be one of str, int, float, bool "
+                f"or list. Got {typehint.__name__} instead."
+            )
+    except TypeError as e:
+        raise QgsPluginInvalidProjectSetting(str(e)) from e
+
     return value if conversion_ok else default
 
 
 def set_project_setting(
-    key: str, value: Union[str, int, float, bool], internal: bool = True
+    key: str, value: Union[str, int, float, bool, Iterable[str]], internal: bool = True
 ) -> bool:
     """
     Set a value in the QGIS project settings
@@ -113,23 +126,45 @@ def set_project_setting(
     """
     proj = QgsProject.instance()
     if internal:
-        return proj.writeEntry(plugin_name(), key, value)
+        if isinstance(value, bool):
+            return proj.writeEntryBool(plugin_name(), key, value)
+        return (
+            proj.writeEntryDouble(plugin_name(), key, value)
+            if isinstance(value, float)
+            else proj.writeEntry(plugin_name(), key, value)
+        )
     QgsExpressionContextUtils.setProjectVariable(proj, key, value)
     return True
 
 
-def parse_value(value: Union[QVariant, str]) -> Union[None, str, bool]:
-    """
-    Parse QSettings value
+@overload
+def parse_value(value: Literal["NULL"]) -> None:
+    ...
+
+
+@overload
+def parse_value(value: Literal["false"]) -> Literal[False]:
+    ...
+
+
+@overload
+def parse_value(value: Literal["true"]) -> Literal[True]:
+    ...
+
+
+@overload
+def parse_value(value: Union[QVariant, str]) -> Union[str, bool, None]:
+    ...
+
+
+def parse_value(value: Union[QVariant, str]) -> Union[str, bool, None]:
+    """Parse QSettings value
 
     :param value: QVariant
     """
     str_value = str(value)
-    val: Union[None, str, bool] = str_value
-    if val == "NULL":
-        val = None
-    elif val == "false":
-        val = False
-    elif val == "true":
-        val = True
-    return val
+    if str_value == "NULL":
+        return None
+    if str_value == "false":
+        return False
+    return True if str_value == "true" else str_value

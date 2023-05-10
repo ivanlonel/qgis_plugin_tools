@@ -1,12 +1,12 @@
-from qgis.PyQt.QtWidgets import QGridLayout, QLayoutItem
-
 __copyright__ = "Copyright 2020-2021, Gispo Ltd"
 __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
-""" Removing functionality adapted from C example
-https://stackoverflow.com/a/19256990/10068922 """
+from qgis.PyQt.QtWidgets import QGridLayout, QLayoutItem
+
+# Removing functionality adapted from C example
+# https://stackoverflow.com/a/19256990/10068922
 
 
 def remove_row(layout: QGridLayout, row: int, delete_widgets: bool = True) -> None:
@@ -79,8 +79,7 @@ def _delete_child_widgets(item: QLayoutItem) -> None:
     :param item:
     :return:
     """
-    layout = item.layout()
-    if layout:
+    if layout := item.layout():
         for i in range(layout.count()):
             _delete_child_widgets(layout.itemAt(i))
         layout.deleteLater()
@@ -91,4 +90,4 @@ def _delete_child_widgets(item: QLayoutItem) -> None:
         widget.setParent(None)
         widget = None
     del item
-    item = None  # noqa F841
+    item = None  # noqa: F841

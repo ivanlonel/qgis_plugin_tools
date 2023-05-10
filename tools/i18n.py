@@ -1,7 +1,12 @@
 """I18n tools."""
 
+__copyright__ = "Copyright 2019, 3Liz, 2020-2021 Gispo Ltd"
+__license__ = "GPL version 3"
+__email__ = "info@3liz.org"
+__revision__ = "$Format:%H$"
+
 from os.path import join
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, cast
 
 from qgis.core import QgsSettings
 from qgis.PyQt.QtCore import QFileInfo, QLocale
@@ -9,15 +14,10 @@ from qgis.PyQt.QtWidgets import QApplication
 
 from .resources import plugin_name, plugin_path, resources_path, slug_name
 
-__copyright__ = "Copyright 2019, 3Liz, 2020-2021 Gispo Ltd"
-__license__ = "GPL version 3"
-__email__ = "info@3liz.org"
-__revision__ = "$Format:%H$"
-
 
 def setup_translation(
     file_pattern: str = "{}.qm", folder: Optional[str] = None
-) -> Tuple[str, Optional[str]]:
+) -> tuple[str, Optional[str]]:
     """Find the translation file according to locale.
 
     :param file_pattern: Custom file pattern to use to find QM files.
@@ -66,4 +66,4 @@ def tr(
     :returns: Translated version of message.
     """
     # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-    return QApplication.translate(context, text).format(*args, **kwargs)
+    return cast(str, QApplication.translate(context, text)).format(*args, **kwargs)

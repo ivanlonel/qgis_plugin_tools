@@ -1,9 +1,14 @@
+__copyright__ = "Copyright 2020-2023, Gispo Ltd"
+__license__ = "GPL version 3"
+__email__ = "info@gispo.fi"
+__revision__ = "$Format:%H$"
+
 import json
 import logging
 import re
 import shutil
 from pathlib import Path
-from typing import Dict, List, Literal, NamedTuple, Optional, Tuple
+from typing import Literal, NamedTuple, Optional, Union
 from urllib.parse import urlencode
 from uuid import uuid4
 
@@ -18,15 +23,10 @@ from .custom_logging import bar_msg
 
 try:
     import requests
-    from requests.exceptions import RequestException
 except ImportError:
-    requests = None  # type: ignore
-    RequestException = None  # type: ignore
-
-__copyright__ = "Copyright 2020-2023, Gispo Ltd"
-__license__ = "GPL version 3"
-__email__ = "info@gispo.fi"
-__revision__ = "$Format:%H$"
+    REQUESTS_IS_AVAILABLE = False
+else:
+    REQUESTS_IS_AVAILABLE = True
 
 LOGGER = logging.getLogger(__name__)
 ENCODING = "utf-8"
@@ -51,7 +51,7 @@ def fetch(
     url: str,
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    params: Optional[Dict[str, str]] = None,
+    params: Optional[dict[str, str]] = None,
 ) -> str:
     """
     Fetch resource from the internet. Similar to requests.get(url) but is
@@ -70,8 +70,8 @@ def post(
     url: str,
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    data: Optional[Dict[str, str]] = None,
-    files: Optional[List[FileField]] = None,
+    data: Optional[dict[str, str]] = None,
+    files: Optional[list[FileField]] = None,
 ) -> str:
     """
     Post resource. Similar to requests.post(url, data, files) but is
@@ -91,8 +91,8 @@ def fetch_raw(
     url: str,
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    params: Optional[Dict[str, str]] = None,
-) -> Tuple[bytes, str]:
+    params: Optional[dict[str, str]] = None,
+) -> tuple[bytes, str]:
     """
     Fetch resource from the internet. Similar to requests.get(url) but is
     recommended way of handling requests in QGIS plugin
@@ -109,9 +109,9 @@ def post_raw(
     url: str,
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    data: Optional[Dict[str, str]] = None,
-    files: Optional[List[FileField]] = None,
-) -> Tuple[bytes, str]:
+    data: Optional[dict[str, str]] = None,
+    files: Optional[list[FileField]] = None,
+) -> tuple[bytes, str]:
     """
     Post resource. Similar to requests.post(url, data, files) but is
     recommended way of handling requests in QGIS plugin
@@ -130,10 +130,10 @@ def request_raw(
     method: Literal["get", "post"] = "get",
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    params: Optional[Dict[str, str]] = None,
-    data: Optional[Dict[str, str]] = None,
-    files: Optional[List[FileField]] = None,
-) -> Tuple[bytes, str]:
+    params: Optional[dict[str, str]] = None,
+    data: Optional[dict[str, str]] = None,
+    files: Optional[list[FileField]] = None,
+) -> tuple[bytes, str]:
     """
     Request resource from the internet. Similar to requests.get(url) and
     requests.post(url, data) but is recommended way of handling requests in QGIS plugin
@@ -152,10 +152,9 @@ def request_raw(
     req = QNetworkRequest(QUrl(url))
     # http://osgeo-org.1560.x6.nabble.com/QGIS-Developer-Do-we-have-a-User-Agent-string-for-QGIS-td5360740.html
     user_agent = QSettings().value("/qgis/networkAndProxy/userAgent", "Mozilla/5.0")
-    user_agent += " " if len(user_agent) else ""
+    user_agent += " " if user_agent else ""
     # noinspection PyUnresolvedReferences
-    user_agent += f"QGIS/{Qgis.QGIS_VERSION_INT}"
-    user_agent += f" {plugin_name()}"
+    user_agent += f"QGIS/{Qgis.QGIS_VERSION_INT} {plugin_name()}"
     # https://www.riverbankcomputing.com/pipermail/pyqt/2016-May/037514.html
     req.setRawHeader(b"User-Agent", bytes(user_agent, encoding))
     request_blocking = QgsBlockingNetworkRequest()
@@ -177,29 +176,23 @@ def request_raw(
             # https://github.com/requests/toolbelt/blob/master/requests_toolbelt/multipart/encoder.py
             boundary = uuid4().hex
             byte_boundary = bytes(f"\r\n--{boundary}\r\n", encoding)
-            last_byte_boundary = bytes(f"\r\n--{boundary}--\r\n", encoding)
 
             # each file may have different content type, name and filename
             byte_data = b""
             for file_field in files:
-                name = file_field[0]
                 file_info = file_field[1]
-                file_name = file_info[0]
-                content = file_info[1]
-                content_type = file_info[2]
                 content_disposition_form_data = (
-                    f"Content-Disposition: form-data;"
-                    f' name="{name}";'
-                    f' filename="{file_name}"\r\n'
+                    "Content-Disposition: form-data;"
+                    f' name="{file_field[0]}";'
+                    f' filename="{file_info[0]}"\r\n'
                 )
-                content_type_form_data = f"Content-Type: {content_type}\r\n\r\n"
-                byte_boundary_with_headers = (
+                byte_data += (
                     byte_boundary
                     + bytes(content_disposition_form_data, encoding)
-                    + bytes(content_type_form_data, encoding)
+                    + bytes(f"Content-Type: {file_info[2]}\r\n\r\n", encoding)
+                    + file_info[1]
                 )
-                byte_data += byte_boundary_with_headers + content
-            byte_data += last_byte_boundary
+            byte_data += bytes(f"\r\n--{boundary}--\r\n", encoding)
             req.setRawHeader(
                 b"Content-Type",
                 bytes(f"multipart/form-data; boundary={boundary}", encoding),
@@ -208,20 +201,20 @@ def request_raw(
             byte_data = b""
         _ = request_blocking.post(req, byte_data)
     else:
-        raise Exception(f"Request method {method} not supported.")
+        raise ValueError(f"Request method {method} not supported.")
     reply: QgsNetworkReplyContent = request_blocking.reply()
     reply_error = reply.error()
-    if reply_error != QNetworkReply.NoError:
+    if reply_error != QNetworkReply.NetworkError.NoError:
         # Error content will be empty in older QGIS versions:
         # https://github.com/qgis/QGIS/issues/42442
-        message = (
-            bytes(reply.content()).decode("utf-8")
-            if len(bytes(reply.content()))
-            else None
-        )
+
         # bar_msg will just show a generic Qt error string.
         raise QgsPluginNetworkException(
-            message=message,
+            message=(
+                bytes(reply.content()).decode("utf-8")
+                if bytes(reply.content())
+                else None
+            ),
             error=reply_error,
             bar_msg=bar_msg(reply.errorString()),
         )
@@ -243,6 +236,7 @@ def download_to_file(
     output_name: Optional[str] = None,
     use_requests_if_available: bool = True,
     encoding: str = ENCODING,
+    timeout: Optional[Union[float, tuple[float, float]]] = None,
 ) -> Path:
     """
     Downloads a binary file to the file efficiently
@@ -253,6 +247,8 @@ def download_to_file(
     :param use_requests_if_available: Use Python package requests
     if it is available in the environment
     :param encoding: Encoding which will be used to decode the bytes
+    :param timeout: How many seconds to wait for the server to send data before giving
+    up, as a float, or a (connect timeout, read timeout) tuple.
     :return: Path to the file
     """
 
@@ -270,29 +266,29 @@ def download_to_file(
 
     output = Path()
 
-    if use_requests_if_available and requests is not None:
+    if use_requests_if_available and REQUESTS_IS_AVAILABLE:
         # https://stackoverflow.com/a/39217788/10068922
 
         try:
-            with requests.get(url, stream=True) as r:
+            with requests.get(url, stream=True, timeout=timeout) as r:
                 try:
                     r.raise_for_status()
-                except Exception:
+                except Exception as e:
                     raise QgsPluginNetworkException(
                         tr("Request failed with status code {}", r.status_code),
                         bar_msg=bar_msg(r.text),
-                    )
+                    ) from e
                 default_filenames = re.findall(
                     "filename=(.+)", r.headers.get(CONTENT_DISPOSITION_HEADER, "")
                 )
-                default_filename = (
-                    default_filenames[0] if len(default_filenames) else ""
-                )
+                default_filename = default_filenames[0] if default_filenames else ""
                 output = get_output(default_filename)
                 with open(output, "wb") as f:
                     shutil.copyfileobj(r.raw, f)
-        except RequestException as e:
-            raise QgsPluginNetworkException(tr("Request failed"), bar_msg=bar_msg(e))
+        except requests.exceptions.RequestException as e:
+            raise QgsPluginNetworkException(
+                tr("Request failed"), bar_msg=bar_msg(e)
+            ) from e
     else:
         # Using simple fetch_raw
         content, default_filename = fetch_raw(url, encoding)

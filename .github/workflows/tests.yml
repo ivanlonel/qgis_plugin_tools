@@ -7,9 +7,17 @@ on:
 jobs:
   code-style:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        python-versions:
+          - 3.9
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-versions }}
       - uses: pre-commit/action@v3.0.0
 
   test:
@@ -20,9 +28,9 @@ jobs:
     strategy:
       matrix:
         qgis-image-tag:
-          - release-3_16
           - release-3_22
           - release-3_28
+          - latest
       fail-fast: false
 
     # Steps represent a sequence of tasks that will be executed as part of the job

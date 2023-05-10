@@ -6,9 +6,10 @@ __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
 import logging
-from typing import List, Optional, Set, Union
+from typing import TYPE_CHECKING, Optional, Union, cast
 
 from qgis.core import (
+    Qgis,
     QgsExpression,
     QgsExpressionContext,
     QgsExpressionContextScope,
@@ -16,6 +17,7 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsMapLayer,
+    QgsUnitTypes,
     QgsVectorLayer,
     QgsWkbTypes,
 )
@@ -24,26 +26,24 @@ from .custom_logging import bar_msg
 from .exceptions import QgsPluginExpressionException
 from .i18n import tr
 
-try:
-    from qgis.core import QgsUnitTypes, QgsVectorLayerTemporalProperties
-except ImportError:
-    QgsVectorLayerTemporalProperties = QgsUnitTypes = None
+if TYPE_CHECKING:
+    from qgis.core import QgsVectorLayerTemporalProperties
 
 LOGGER = logging.getLogger(__name__)
 
 POINT_TYPES = {
-    QgsWkbTypes.Point,
-    QgsWkbTypes.MultiPoint,
+    QgsWkbTypes.Type.Point,
+    QgsWkbTypes.Type.MultiPoint,
 }
 
 LINE_TYPES = {
-    QgsWkbTypes.LineString,
-    QgsWkbTypes.MultiLineString,
+    QgsWkbTypes.Type.LineString,
+    QgsWkbTypes.Type.MultiLineString,
 }
 POLYGON_TYPES = {
-    QgsWkbTypes.Polygon,
-    QgsWkbTypes.MultiPolygon,
-    QgsWkbTypes.CurvePolygon,
+    QgsWkbTypes.Type.Polygon,
+    QgsWkbTypes.Type.MultiPolygon,
+    QgsWkbTypes.Type.CurvePolygon,
 }
 
 
@@ -52,10 +52,10 @@ class LayerType(enum.Enum):
     Point = {"wkb_types": POINT_TYPES}
     Line = {"wkb_types": LINE_TYPES}
     Polygon = {"wkb_types": POLYGON_TYPES}
-    Unknown = {"wkb_types": set()}  # type: ignore
+    Unknown: dict[str, set[QgsWkbTypes.Type]] = {"wkb_types": set()}
 
     @staticmethod
-    def from_wkb_type(wkb_type: int) -> "LayerType":
+    def from_wkb_type(wkb_type: QgsWkbTypes.Type) -> "LayerType":
         return next(
             (
                 l_type
@@ -74,7 +74,7 @@ class LayerType(enum.Enum):
         return LayerType.from_wkb_type(geometry.wkbType())
 
     @property
-    def wkb_types(self) -> Set[QgsWkbTypes.GeometryType]:
+    def wkb_types(self) -> set[QgsWkbTypes.Type]:
         return self.value["wkb_types"]
 
 
@@ -82,7 +82,7 @@ def set_temporal_settings(
     layer: QgsVectorLayer,
     dt_field: str,
     time_step: int,
-    unit: "QgsUnitTypes.TemporalUnit" = None,
+    unit: Optional["QgsUnitTypes.TemporalUnit"] = None,
 ) -> None:
     """
     Set temporal settings for vector layer temporal range for raster layer
@@ -91,14 +91,12 @@ def set_temporal_settings(
     :param time_step: time step in some QgsUnitTypes.TemporalUnit
     :param unit: QgsUnitTypes.TemporalUnit
     """
-    if unit is None:
-        unit = QgsUnitTypes.TemporalMinutes
-    mode = QgsVectorLayerTemporalProperties.ModeFeatureDateTimeInstantFromField
-    tprops: QgsVectorLayerTemporalProperties = layer.temporalProperties()
-    tprops.setMode(mode)
+    tprops = cast("QgsVectorLayerTemporalProperties", layer.temporalProperties())
+    tprops.setMode(Qgis.VectorTemporalMode.FeatureDateTimeInstantFromField)
+
     tprops.setStartField(dt_field)
     tprops.setFixedDuration(time_step)
-    tprops.setDurationUnits(unit)
+    tprops.setDurationUnits(unit or QgsUnitTypes.TemporalUnit.TemporalMinutes)
     tprops.setIsActive(True)
 
 
@@ -106,7 +104,7 @@ def evaluate_expressions(
     exp: QgsExpression,
     feature: Optional[QgsFeature] = None,
     layer: Optional[QgsMapLayer] = None,
-    context_scopes: Optional[List[QgsExpressionContextScope]] = None,
+    context_scopes: Optional[list[QgsExpressionContextScope]] = None,
 ) -> Union[bool, int, str, float, None]:
     """
     Evaluate a QGIS expression
@@ -125,7 +123,7 @@ def evaluate_expressions(
     if feature:
         context.setFeature(feature)
 
-    value = exp.evaluate(context)
+    value: Union[bool, int, str, float, None] = exp.evaluate(context)
     if exp.hasParserError():
         raise QgsPluginExpressionException(bar_msg=bar_msg(exp.parserErrorString()))
 

@@ -1,11 +1,26 @@
 """Setting up logging using QGIS, file, Sentry..."""
 
+__copyright__ = "Copyright 2020-2021, Gispo Ltd"
+__license__ = "GPL version 3"
+__email__ = "info@gispo.fi"
+__revision__ = "$Format:%H$"
+
+import contextlib
 import functools
 import logging
+from collections.abc import Callable, Iterable
 from enum import Enum, unique
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import (
+    Any,
+    Literal,
+    Optional,
+    Protocol,
+    TypedDict,
+    overload,
+    runtime_checkable,
+)
 
 from qgis.core import Qgis, QgsApplication, QgsMessageLog
 from qgis.gui import QgisInterface, QgsMessageBar
@@ -16,10 +31,18 @@ from .i18n import tr
 from .resources import plugin_name, plugin_path, profile_path
 from .settings import get_setting, setting_key
 
-__copyright__ = "Copyright 2020-2021, Gispo Ltd"
-__license__ = "GPL version 3"
-__email__ = "info@gispo.fi"
-__revision__ = "$Format:%H$"
+
+class BarMsg(TypedDict, total=False):
+    details: str
+    success: bool
+    duration: int
+
+
+@runtime_checkable
+class HasQgsMessageBarFilterLogRecordAttributes(Protocol):
+    details: str
+    qgis_level: Qgis.MessageLevel
+    duration: int
 
 
 @unique
@@ -31,7 +54,7 @@ class LogTarget(Enum):
     BAR = {"id": "bar", "default": "INFO"}
 
     @property
-    def id(self) -> str:
+    def id(self) -> str:  # noqa: A003
         return self.value["id"]
 
     @property
@@ -39,7 +62,7 @@ class LogTarget(Enum):
         return self.value["default"]
 
 
-def qgis_level(logging_level: str) -> int:
+def qgis_level(logging_level: str) -> Qgis.MessageLevel:
     """Check for the corresponding QGIS Level according to Logging Level.
 
     For QGIS:
@@ -55,17 +78,15 @@ def qgis_level(logging_level: str) -> int:
     :rtype: Qgis.MessageLevel
     """
     if logging_level in {"CRITICAL", "ERROR"}:
-        return Qgis.Critical
-    elif logging_level in {"INFO", "DEBUG"}:
-        return Qgis.Info
-    elif logging_level == "WARNING":
-        return Qgis.Warning
-    return Qgis.Info
+        return Qgis.MessageLevel.Critical
+    if logging_level == "WARNING":
+        return Qgis.MessageLevel.Warning
+    return Qgis.MessageLevel.Info
 
 
 def bar_msg(
     details: Any = "", duration: Optional[int] = None, success: bool = False
-) -> Dict[str, Any]:
+) -> BarMsg:
     """
     Helper function to construct extra arguments for message bar logger message
 
@@ -75,7 +96,7 @@ def bar_msg(
         by the user.
     :param success: Whether the message is success message or not
     """
-    args = {"details": str(details), "success": success}
+    args: BarMsg = {"details": str(details), "success": success}
     if duration is not None:
         args["duration"] = duration
     return args
@@ -96,13 +117,12 @@ class QgsLogHandler(logging.Handler):
         :param record: logging record containing whatever info needs to be
                 logged.
         """
-        tag_kwargs = (
-            {} if self._message_log_name is None else {"tag": self._message_log_name}
-        )
         try:
             # noinspection PyCallByClass,PyTypeChecker
             QgsMessageLog.logMessage(
-                record.getMessage(), level=qgis_level(record.levelname), **tag_kwargs
+                record.getMessage(),
+                tag=self._message_log_name or "",
+                level=qgis_level(record.levelname),
             )
         except MemoryError:
             message = tr(
@@ -111,7 +131,11 @@ class QgsLogHandler(logging.Handler):
             ).format(self._message_log_name)
             # print(message)
             # noinspection PyCallByClass,PyTypeChecker
-            QgsMessageLog.logMessage(message, level=Qgis.Critical, **tag_kwargs)
+            QgsMessageLog.logMessage(
+                message,
+                tag=self._message_log_name or "",
+                level=Qgis.MessageLevel.Critical,
+            )
 
 
 class QgsMessageBarFilter(logging.Filter):
@@ -127,19 +151,41 @@ class QgsMessageBarFilter(logging.Filter):
             Whether the message is success message or not
     """
 
-    def filter(self, record: logging.LogRecord) -> bool:
+    def filter(self, record: logging.LogRecord) -> bool:  # noqa: A003
         args = record.__dict__
         if "details" not in args:
             return False
 
-        record.qgis_level = (  # type: ignore
-            Qgis.Success if args.get("success", False) else qgis_level(record.levelname)
+        record.qgis_level = (
+            Qgis.MessageLevel.Success
+            if args.get("success", False)
+            else qgis_level(record.levelname)
         )
-        record.duration = args.get("duration", self.bar_msg_duration(record.levelname))  # type: ignore # noqa E501
+        record.duration = args.get("duration", self.bar_msg_duration(record.levelname))
         return True
 
+    @overload
     @staticmethod
-    def bar_msg_duration(logging_level: str) -> int:
+    def bar_msg_duration(logging_level: Literal["CRITICAL"]) -> Literal[12]:
+        ...
+
+    @overload
+    @staticmethod
+    def bar_msg_duration(logging_level: Literal["ERROR"]) -> Literal[10]:
+        ...
+
+    @overload
+    @staticmethod
+    def bar_msg_duration(logging_level: Literal["WARNING"]) -> Literal[6]:
+        ...
+
+    @overload
+    @staticmethod
+    def bar_msg_duration(logging_level: str) -> Literal[4, 6, 10, 12]:
+        ...
+
+    @staticmethod
+    def bar_msg_duration(logging_level: str) -> Literal[4, 6, 10, 12]:
         """Check default duration for messages in message bar based on level.
 
         :param logging_level: The Logging level
@@ -147,31 +193,31 @@ class QgsMessageBarFilter(logging.Filter):
         """
         if logging_level == "CRITICAL":
             return 12
-        elif logging_level == "ERROR":
+        if logging_level == "ERROR":
             return 10
-        elif logging_level in {"INFO", "DEBUG"}:
-            return 4
-        elif logging_level == "WARNING":
-            return 6
-        return 4
+        return 6 if logging_level == "WARNING" else 4
 
 
 class SimpleMessageBarProxy(QObject):
     """Signal-slot pair to always push messages in the main thread."""
 
-    _emit_message = pyqtSignal(str, str, int, int)
+    _emit_message = pyqtSignal(str, str, Qgis.MessageLevel, int)
 
     def __init__(self, msg_bar: Optional[QgsMessageBar] = None) -> None:
         super().__init__()
         self._msg_bar = msg_bar
         self._emit_message.connect(self.push_message)
 
-    def emit_message(self, title: str, text: str, level: int, duration: int) -> None:
+    def emit_message(
+        self, title: str, text: str, level: Qgis.MessageLevel, duration: int
+    ) -> None:
         self._emit_message.emit(title, text, level, duration)
 
-    @pyqtSlot(str, str, int, int)
-    def push_message(self, title: str, text: str, level: int, duration: int) -> None:
-        try:
+    @pyqtSlot(str, str, Qgis.MessageLevel, int)
+    def push_message(
+        self, title: str, text: str, level: Qgis.MessageLevel, duration: int
+    ) -> None:
+        with contextlib.suppress(Exception):
             if self._msg_bar is not None:
                 self._msg_bar.pushMessage(
                     title=title,
@@ -179,8 +225,6 @@ class SimpleMessageBarProxy(QObject):
                     level=level,
                     duration=duration,
                 )
-        except Exception:
-            pass
 
 
 class QgsMessageBarHandler(logging.Handler):
@@ -199,11 +243,18 @@ class QgsMessageBarHandler(logging.Handler):
         :param record: logging record enriched with extra information from
             QgsMessageBarFilter
         """
+        if not isinstance(record, HasQgsMessageBarFilterLogRecordAttributes):
+            raise ValueError(
+                "logging.LogRecord missing one or more of the following attributes: "
+                + ", ".join(
+                    vars(HasQgsMessageBarFilterLogRecordAttributes)["__annotations__"]
+                )
+            )
         self._message_bar_proxy.emit_message(
             record.message,
-            record.details,  # type: ignore
-            record.qgis_level,  # type: ignore
-            record.duration,  # type: ignore
+            record.details,
+            record.qgis_level,
+            record.duration,
         )
 
 
@@ -241,7 +292,10 @@ def get_log_level_name(target: LogTarget) -> str:
 
 def get_log_level(target: LogTarget) -> int:
     """Finds log level of the target"""
-    return logging.getLevelName(get_log_level_name(target))
+    level = logging.getLevelName(get_log_level_name(target))
+    if not isinstance(level, int):
+        raise ValueError(f"No predefined log level found for key {target.id}")
+    return level
 
 
 def get_log_folder() -> Path:
@@ -261,8 +315,8 @@ def get_log_folder() -> Path:
 
 def _create_handlers(
     message_log_name: str, message_bar: Optional[QgsMessageBar]
-) -> List[logging.Handler]:
-    handlers: List[logging.Handler] = []
+) -> list[logging.Handler]:
+    handlers: list[logging.Handler] = []
 
     stream_level = get_log_level(LogTarget.STREAM)
     if stream_level > logging.NOTSET:
@@ -313,7 +367,7 @@ def _create_handlers(
     return handlers
 
 
-def setup_logger(  # noqa QGS105
+def setup_logger(  # noqa: QGS105
     logger_name: str, iface: Optional[QgisInterface] = None
 ) -> logging.Logger:
     """Run once when the module is loaded and enable logging.
@@ -332,14 +386,16 @@ def setup_logger(  # noqa QGS105
        LOGGER.info('Some bar message', extra={'details': 'details'})
        LOGGER.info('Some bar message', extra=bar_msg('details')) # With helper function
     """
-
     if iface is None:
         try:
-            from qgis.utils import iface  # type: ignore
+            # pylint: disable-next=import-outside-toplevel
+            from qgis.utils import iface as _iface
         except ImportError:
-            iface = None
+            _iface = None
+    else:
+        _iface = iface
 
-    message_bar = iface.messageBar() if iface is not None else None
+    message_bar = _iface.messageBar() if _iface is not None else None
     # keep api stable and create the handlers as if the passed logger name
     # was plugin_name()
     handlers = _create_handlers(plugin_name(), message_bar)
@@ -350,8 +406,8 @@ def setup_logger(  # noqa QGS105
     if logger_name == plugin_name():
         logger_names.append(__name__.replace(".tools.custom_logging", "", 1))
 
-    for logger_name in logger_names:
-        logger = logging.getLogger(logger_name)
+    for name in logger_names:
+        logger = logging.getLogger(name)
 
         # take the lowest level from the enabled handlers
         logger.setLevel(min(h.level for h in handlers))
@@ -371,7 +427,7 @@ def add_logger_msg_bar_to_widget(logger_name: str, widget: QWidget) -> None:
     """
     if not hasattr(widget, "message_bar"):
         layout: QLayout = widget.layout()
-        widget.message_bar = QgsMessageBar(widget)  # type: ignore
+        widget.message_bar = QgsMessageBar(widget)
         if isinstance(layout, QVBoxLayout):
             # noinspection PyArgumentList
             layout.insertWidget(0, widget.message_bar)
@@ -414,10 +470,8 @@ def teardown_logger(logger_name: str) -> None:
         teardown_logger(__name__.replace(".tools.custom_logging", "", 1))
 
 
-def teardown_loggers(logger_names: List[str]) -> None:
-    """
-    Remove the added handlers from the speficied handler.
-    """
+def teardown_loggers(logger_names: Iterable[str]) -> None:
+    """Remove the added handlers from the speficied handler."""
     for logger_name in logger_names:
         teardown_logger(logger_name)
 
@@ -434,12 +488,10 @@ def setup_loggers(
     the returned callback in unload.
     """
     if message_bar is None:
-        try:
-            from qgis.utils import iface
+        with contextlib.suppress(ImportError):
+            from qgis.utils import iface  # pylint: disable=import-outside-toplevel
 
-            message_bar = iface.messageBar()
-        except ImportError:
-            message_bar = None
+            message_bar = iface.messageBar() if iface is not None else None
 
     handlers = _create_handlers(message_log_name, message_bar)
 

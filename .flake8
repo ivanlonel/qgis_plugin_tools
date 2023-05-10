@@ -1,0 +1,26 @@
+[flake8]
+# Black compatible values https://black.readthedocs.io/en/stable/the_black_code_style/current_style.html#line-length
+extend-select =
+    B950    # Line too long (flake8-bugbear)
+extend-ignore =
+    # Missing type annotation for self in method
+    ANN101
+    # Missing Docstrings (pydocstyle)
+    D1
+    # Docstring Content Issues (pydocstyle)
+    D4
+    # Whitespace before ‘,’, ‘;’, or ‘:’
+    E203
+    # Line too long (pycodestyle)
+    E501
+    # Line break before binary operator
+    W503
+per-file-ignores =
+    infrastructure/plugin_maker.py: B950, T201
+    test/*.py: ANN001, ANN201
+    tools/*.py: D205
+    tools/exceptions.py: D205, N818
+max-complexity = 12
+max-line-length = 88
+noqa-require-code = true
+noqa-include-name = true

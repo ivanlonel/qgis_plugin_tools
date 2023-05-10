@@ -3,11 +3,12 @@ __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
 
 import logging
-from typing import Callable, Optional, Union
+from collections.abc import Callable
+from typing import Optional, Union, cast
 
 from qgis.core import QgsApplication, QgsTask
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtBoundSignal, pyqtSignal
 from qgis.PyQt.QtGui import QCloseEvent
 from qgis.PyQt.QtWidgets import (
     QDialog,
@@ -31,9 +32,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class ProgressDialog(QDialog, FORM_CLASS):
-    """
-    Dialog containing progress bar to show processes of long running tasks.
-    """
+    """Dialog containing progress bar to show processes of long running tasks."""
 
     progress_bar: QProgressBar
     status_label: QLabel
@@ -55,7 +54,10 @@ class ProgressDialog(QDialog, FORM_CLASS):
             self.push_btn.setText(abort_btn_text)
             layout = QHBoxLayout()
             spacer = QSpacerItem(
-                100, 20, QSizePolicy.MinimumExpanding, QSizePolicy.Expanding
+                100,
+                20,
+                QSizePolicy.Policy.MinimumExpanding,
+                QSizePolicy.Policy.Expanding,
             )
             layout.addSpacerItem(spacer)
             layout.addWidget(self.push_btn)
@@ -65,7 +67,7 @@ class ProgressDialog(QDialog, FORM_CLASS):
         self.update_progress_bar(0)
 
     def set_status(self, status_text: str) -> None:
-        LOGGER.debug(f"Status:   {status_text}")
+        LOGGER.debug("Status:   %s", status_text)
         self.status_label.setText(status_text)
 
     def update_progress_bar(self, progress: Union[int, float]) -> None:
@@ -89,9 +91,7 @@ def create_simple_continuous_progress_dialog(
     show_abort_button: bool = False,
     abort_btn_text: str = ProgressDialog.abort_btn_text,
 ) -> ProgressDialog:
-    """
-    Creates simple progress dialog with a continuous progress bar.
-    """
+    """Creates simple progress dialog with a continuous progress bar."""
     progress_dialog = ProgressDialog(parent, show_abort_button, abort_btn_text)
     progress_dialog.progress_bar.setMaximum(0)
     progress_dialog.progress_bar.setMinimum(0)
@@ -108,12 +108,12 @@ def run_task_with_progress_dialog(
     completed_callback: Optional[Callable] = None,
     terminated_callback: Optional[Callable] = None,
 ) -> None:
-    """
-    Runs a given task while showing a progress bar dialog.
-    """
+    """Runs a given task while showing a progress bar dialog."""
     progress_dialog = ProgressDialog(parent, show_abort_button, abort_btn_text)
     progress_dialog.set_status(status_text)
-    task.progressChanged.connect(progress_dialog.update_progress_bar)
+    cast(pyqtBoundSignal, task.progressChanged).connect(
+        progress_dialog.update_progress_bar
+    )
     _make_connections_and_run_task(
         progress_dialog, task, completed_callback, terminated_callback
     )
@@ -128,9 +128,7 @@ def run_task_with_continuous_progress_dialog(
     completed_callback: Optional[Callable] = None,
     terminated_callback: Optional[Callable] = None,
 ) -> None:
-    """
-    Runs a given task while showing a simple continuous progress bar dialog.
-    """
+    """Runs a given task while showing a simple continuous progress bar dialog."""
     progress_dialog = create_simple_continuous_progress_dialog(
         status_text, parent, show_abort_button, abort_btn_text
     )
@@ -145,13 +143,13 @@ def _make_connections_and_run_task(
     completed_callback: Optional[Callable],
     terminated_callback: Optional[Callable],
 ) -> None:
-    task.taskCompleted.connect(lambda: progress_dialog.close())
-    task.taskTerminated.connect(lambda: progress_dialog.close())
+    cast(pyqtBoundSignal, task.taskCompleted).connect(progress_dialog.close)
+    cast(pyqtBoundSignal, task.taskTerminated).connect(progress_dialog.close)
     progress_dialog.aborted.connect(task.cancel)
     if completed_callback:
-        task.taskCompleted.connect(completed_callback)
+        cast(pyqtBoundSignal, task.taskCompleted).connect(completed_callback)
     if terminated_callback:
-        task.taskTerminated.connect(terminated_callback)
+        cast(pyqtBoundSignal, task.taskTerminated).connect(terminated_callback)
     task_manager = QgsApplication.taskManager()
     task_manager.addTask(task)
     # Wait until task is either completed or terminated

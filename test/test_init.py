@@ -5,6 +5,7 @@ __revision__ = "$Format:%H$"
 __date__ = "17/10/2010"
 __license__ = "GPL"
 __copyright__ = "Copyright 2012, Australia Indonesia Facility for Disaster Reduction"
+
 import configparser
 
 import pytest
@@ -16,7 +17,6 @@ from ..tools.resources import plugin_path
 @pytest.mark.skipif(is_running_in_tools_module_ci(), reason="In CI")
 def test_read_init():
     """Test that the plugin __init__ will validate on plugins.qgis.org."""
-
     # You should update this list according to the latest in
     # https://github.com/qgis/qgis-django/blob/master/qgis-app/
     #        plugins/validator.py
@@ -33,8 +33,8 @@ def test_read_init():
     file_path = plugin_path("metadata.txt")
     metadata = []
     parser = configparser.ConfigParser()
-    parser.optionxform = str
-    parser.read(file_path)
+    parser.optionxform = str  # type: ignore[assignment,method-assign]
+    parser.read(file_path, encoding="utf8")
     message = f'Cannot find a section named "general" in {file_path}'
     assert parser.has_section("general"), message
     metadata.extend(parser.items("general"))

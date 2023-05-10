@@ -1,0 +1,33 @@
+# https://editorconfig.org/
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.py]
+profile = black
+
+[*.{conf,geojson,gml,ini,json,kml,qgs,qlr,qml,qpt,qrc,qss,toml,ui,xml,yaml,yml}]
+indent_size = 2
+
+# Web Files
+[*.{htm,html,js,jsm,ts,tsx,css,sass,scss,less,svg,vue}]
+indent_size = 2
+
+# Markdown uses two trailing spaces for a line break
+[*.{md,mdown,mdx,markdown}]
+indent_size = 2
+trim_trailing_whitespace = false
+
+# CSV-like
+[*.{tsv,tab,csv}]
+indent_style = tab
+insert_final_newline = false
+trim_trailing_whitespace = false
+
+[*.{bat,cmd}]
+end_of_line = crlf

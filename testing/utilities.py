@@ -1,19 +1,18 @@
-# coding=utf-8
 """Common functionality used by regression tests."""
 
 import os
 import time
 import warnings
-from typing import Type, Union
+from typing import NoReturn, Union, cast
 
 from qgis.core import QgsApplication, QgsTask
-from qgis.PyQt.QtCore import QCoreApplication
+from qgis.PyQt.QtCore import QCoreApplication, pyqtBoundSignal
 
 from ..tools.exceptions import QgsPluginNotImplementedException
 from ..tools.tasks import BaseTask
 
 
-def get_qgis_app():  # noqa
+def get_qgis_app() -> NoReturn:
     warnings.warn(
         "get_qgis_app() is deprecated. Use library pytest-qgis instead.",
         DeprecationWarning,
@@ -38,7 +37,8 @@ def is_running_in_tools_module_ci() -> bool:
 
 def qgis_supports_temporal() -> bool:
     try:
-        from qgis.core import QgsRasterLayerTemporalProperties  # noqa F401
+        # pylint: disable-next=unused-import,import-outside-toplevel
+        from qgis.core import QgsRasterLayerTemporalProperties  # noqa: F401
 
         return True
     except ImportError:
@@ -46,9 +46,7 @@ def qgis_supports_temporal() -> bool:
 
 
 class TestTaskRunner:
-    """
-    This utility class could be used when running tasks in tests.
-    """
+    """This utility class could be used when running tasks in tests."""
 
     success = False
     fail = False
@@ -69,12 +67,10 @@ class TestTaskRunner:
         cancel: bool = False,
         sleep_before_cancel: Union[int, float] = 0.0,
     ) -> bool:
-        """
-        Run task and return whether it was successful or not.
-        """
-        task.taskCompleted.connect(self.completed)
-        task.taskTerminated.connect(self.terminated)
-        task.progressChanged.connect(self.set_progress)
+        """Run task and return whether it was successful or not."""
+        cast(pyqtBoundSignal, task.taskCompleted).connect(self.completed)
+        cast(pyqtBoundSignal, task.taskTerminated).connect(self.terminated)
+        cast(pyqtBoundSignal, task.progressChanged).connect(self.set_progress)
         QgsApplication.taskManager().addTask(task)
 
         if cancel:
@@ -88,14 +84,12 @@ class TestTaskRunner:
 
 
 class SimpleTask(BaseTask):
-    """
-    Test task to used in tests needing a simple task.
-    """
+    """Test task to used in tests needing a simple task."""
 
     def __init__(
         self,
         will_fail: bool = False,
-        error_to_raise: Type[Exception] = ValueError,
+        error_to_raise: type[Exception] = ValueError,
         steps: int = 10,
         sleep_time: float = 0.01,
     ) -> None:
