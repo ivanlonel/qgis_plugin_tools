@@ -3,6 +3,7 @@ __license__ = "GPL version 2"
 __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
+from functools import wraps
 from typing import Any, Callable
 
 from .exceptions import QgsPluginException
@@ -16,7 +17,6 @@ def log_if_fails(fn: Callable) -> Callable:
     Use this as a decorator with functions and methods that
     might throw uncaught exceptions.
     """
-    from functools import wraps
 
     @wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> None:
@@ -36,7 +36,6 @@ def log_if_fails(fn: Callable) -> Callable:
 
 def taskify(fn: Callable) -> Callable:
     """Decoration used to turn any function or method into a FunctionTask task."""
-    from functools import wraps
 
     @wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> FunctionTask:
