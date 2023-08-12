@@ -137,7 +137,6 @@ module = [
   "osgeo",
   "ptvsd",
   "pydevd",
-  "pytest",
   "qgis.PyQt.*",
   "qgis.utils",
 ]
