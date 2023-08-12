@@ -3,7 +3,7 @@
 import argparse
 import os
 import shutil
-import subprocess
+import subprocess  # nosec: B404
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
@@ -314,9 +314,9 @@ Put -h after command to see available optional arguments if any
                     f"You can move the file whenever you want."
                 )
         else:
-            process = subprocess.Popen(
+            process = subprocess.Popen(  # nosec: B607
                 "cmd.exe",
-                shell=False,
+                shell=False,  # nosec: B603
                 universal_newlines=True,
                 stdin=subprocess.PIPE,
                 stdout=sys.stdout,
@@ -384,7 +384,7 @@ Put -h after command to see available optional arguments if any
 
         process = subprocess.Popen(
             "cmd.exe" if is_windows() else "sh",
-            shell=False,
+            shell=False,  # nosec: B603
             universal_newlines=True,
             stdin=subprocess.PIPE,
             stdout=sys.stdout,
@@ -399,7 +399,7 @@ Put -h after command to see available optional arguments if any
         if d is not None:
             cmd = f"cd {d} && {cmd}"
         echo(cmd, force=force_show_output)
-        pros = subprocess.Popen(
+        pros = subprocess.Popen(  # nosec: B603
             args,
             cwd=d,
             stdout=subprocess.PIPE,
