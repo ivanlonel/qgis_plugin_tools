@@ -97,9 +97,7 @@ class BaseTask(QgsTask):
 
 
 class FunctionTask(BaseTask):
-    """
-    Utility class for creating a task out of a function.
-    """
+    """Utility class for creating a task out of a function."""
 
     def __init__(self, callback_function: Callable) -> None:
         super().__init__()

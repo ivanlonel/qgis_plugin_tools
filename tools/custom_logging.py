@@ -410,9 +410,7 @@ def teardown_logger(logger_name: str) -> None:
 
 
 def teardown_loggers(logger_names: list[str]) -> None:
-    """
-    Remove the added handlers from the speficied handler.
-    """
+    """Remove the added handlers from the speficied handler."""
     for logger_name in logger_names:
         teardown_logger(logger_name)
 
