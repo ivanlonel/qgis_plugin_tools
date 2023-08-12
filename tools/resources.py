@@ -119,7 +119,7 @@ def plugin_name() -> str:
     :return: The stripped plugin name.
     :rtype: basestring
     """
-    global PLUGIN_NAME
+    global PLUGIN_NAME  # pylint: disable=global-statement
 
     if PLUGIN_NAME != "":
         return PLUGIN_NAME
@@ -155,7 +155,7 @@ def plugin_display_name() -> str:
 
 def slug_name() -> str:
     """Return project slug name in .qgis-plugin.ci"""
-    global SLUG_NAME
+    global SLUG_NAME  # pylint: disable=global-statement
 
     if SLUG_NAME != "":
         return SLUG_NAME
