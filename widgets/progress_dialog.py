@@ -3,11 +3,11 @@ __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
 
 import logging
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, cast
 
 from qgis.core import QgsApplication, QgsTask
 from qgis.PyQt import uic
-from qgis.PyQt.QtCore import pyqtSignal
+from qgis.PyQt.QtCore import pyqtBoundSignal, pyqtSignal
 from qgis.PyQt.QtGui import QCloseEvent
 from qgis.PyQt.QtWidgets import (
     QDialog,
@@ -110,7 +110,9 @@ def run_task_with_progress_dialog(
     """Runs a given task while showing a progress bar dialog."""
     progress_dialog = ProgressDialog(parent, show_abort_button, abort_btn_text)
     progress_dialog.set_status(status_text)
-    task.progressChanged.connect(progress_dialog.update_progress_bar)
+    cast(pyqtBoundSignal, task.progressChanged).connect(
+        progress_dialog.update_progress_bar
+    )
     _make_connections_and_run_task(
         progress_dialog, task, completed_callback, terminated_callback
     )
@@ -140,13 +142,13 @@ def _make_connections_and_run_task(
     completed_callback: Optional[Callable],
     terminated_callback: Optional[Callable],
 ) -> None:
-    task.taskCompleted.connect(progress_dialog.close)
-    task.taskTerminated.connect(progress_dialog.close)
+    cast(pyqtBoundSignal, task.taskCompleted).connect(progress_dialog.close)
+    cast(pyqtBoundSignal, task.taskTerminated).connect(progress_dialog.close)
     progress_dialog.aborted.connect(task.cancel)
     if completed_callback:
-        task.taskCompleted.connect(completed_callback)
+        cast(pyqtBoundSignal, task.taskCompleted).connect(completed_callback)
     if terminated_callback:
-        task.taskTerminated.connect(terminated_callback)
+        cast(pyqtBoundSignal, task.taskTerminated).connect(terminated_callback)
     task_manager = QgsApplication.taskManager()
     task_manager.addTask(task)
     # Wait until task is either completed or terminated
