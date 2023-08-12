@@ -36,7 +36,7 @@ class BaseTask(QgsTask):
         :return: whether task finished successfully or not.
         """
 
-        LOGGER.debug(f"Started task {self.name}")
+        LOGGER.debug("Started task %s", self.name)
         try:
             self._check_if_canceled()
             return self._run()
@@ -55,8 +55,9 @@ class BaseTask(QgsTask):
         """
         if result:
             LOGGER.debug(
-                f"Task {self.name} ended successfully in "
-                f"{self.elapsedTime() / 1000:.2f}!"
+                "Task %s ended successfully in %.2f!",
+                self.name,
+                self.elapsedTime() / 1000,
             )
         elif self.exception is None:
             MsgBar.warning(

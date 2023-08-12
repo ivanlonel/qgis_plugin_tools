@@ -68,7 +68,7 @@ class ProgressDialog(QDialog, FORM_CLASS):
         self.update_progress_bar(0)
 
     def set_status(self, status_text: str) -> None:
-        LOGGER.debug(f"Status:   {status_text}")
+        LOGGER.debug("Status:   %s", status_text)
         self.status_label.setText(status_text)
 
     def update_progress_bar(self, progress: Union[int, float]) -> None:
