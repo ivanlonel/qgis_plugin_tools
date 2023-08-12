@@ -40,7 +40,7 @@ def load_ui_file(package: importlib.resources.Package, ui_file_name: str) -> Any
     base_class: type[QWidget]
     ui_class, base_class = uic.loadUiType(str(ui_file_path))
 
-    class UiFileWidget(base_class, ui_class):  # type: ignore
+    class UiFileWidget(base_class, ui_class):  # type: ignore[misc,valid-type]
         def __init__(
             self,
             *args: Any,
