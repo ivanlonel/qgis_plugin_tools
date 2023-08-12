@@ -161,18 +161,22 @@ class QgsMessageBarFilter(logging.Filter):
 class SimpleMessageBarProxy(QObject):
     """Signal-slot pair to always push messages in the main thread."""
 
-    _emit_message = pyqtSignal(str, str, int, int)
+    _emit_message = pyqtSignal(str, str, Qgis.MessageLevel, int)
 
     def __init__(self, msg_bar: Optional[QgsMessageBar] = None) -> None:
         super().__init__()
         self._msg_bar = msg_bar
         self._emit_message.connect(self.push_message)
 
-    def emit_message(self, title: str, text: str, level: int, duration: int) -> None:
+    def emit_message(
+        self, title: str, text: str, level: Qgis.MessageLevel, duration: int
+    ) -> None:
         self._emit_message.emit(title, text, level, duration)
 
-    @pyqtSlot(str, str, int, int)
-    def push_message(self, title: str, text: str, level: int, duration: int) -> None:
+    @pyqtSlot(str, str, Qgis.MessageLevel, int)
+    def push_message(
+        self, title: str, text: str, level: Qgis.MessageLevel, duration: int
+    ) -> None:
         with contextlib.suppress(Exception):
             if self._msg_bar is not None:
                 self._msg_bar.pushMessage(

@@ -1,6 +1,7 @@
 from threading import Thread
 from unittest.mock import MagicMock
 
+from qgis.core import Qgis
 from qgis.PyQt.QtCore import QCoreApplication
 
 from ..tools.custom_logging import SimpleMessageBarProxy
@@ -11,7 +12,7 @@ def test_message_log_proxies_between_threads():
     proxy = SimpleMessageBarProxy(mock_msg_bar)
 
     def mock_thread():
-        proxy.emit_message("title", "text", 1, 2)
+        proxy.emit_message("title", "text", Qgis.MessageLevel.Warning, 2)
 
     thread = Thread(target=mock_thread)
     thread.start()
@@ -22,5 +23,5 @@ def test_message_log_proxies_between_threads():
 
     QCoreApplication.processEvents()
     mock_msg_bar.pushMessage.assert_called_once_with(
-        title="title", text="text", level=1, duration=2
+        title="title", text="text", level=Qgis.MessageLevel.Warning, duration=2
     )
