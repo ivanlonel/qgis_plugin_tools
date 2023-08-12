@@ -4,6 +4,8 @@ __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
 
+from collections.abc import Generator
+
 import pytest
 
 from ..testing.utilities import TestTaskRunner
@@ -31,12 +33,12 @@ def task_runner(initialize_logger):  # pylint: disable=redefined-outer-name
 
 
 @pytest.fixture()
-def file_fixture() -> tuple[str, bytes, str]:
+def file_fixture() -> Generator[tuple[str, bytes, str], None, None]:
     with open("test/fixtures/file.xml", "rb") as f:
         yield "file.xml", f.read(), "text/xml"
 
 
 @pytest.fixture()
-def another_file_fixture() -> tuple[str, bytes, str]:
+def another_file_fixture() -> Generator[tuple[str, bytes, str], None, None]:
     with open("test/fixtures/text.txt", "rb") as f:
         yield "text.txt", f.read(), "text/plain"
