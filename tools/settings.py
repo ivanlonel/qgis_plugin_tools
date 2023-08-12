@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import TYPE_CHECKING, Any, Optional, Union
+from typing import TYPE_CHECKING, Any, Optional, TypeVar, Union
 
 from qgis.core import QgsExpressionContextUtils, QgsProject, QgsSettings
 from qgis.PyQt.QtCore import QVariant
@@ -15,6 +15,9 @@ if TYPE_CHECKING:
     class QgsSettingsValueKeywordArgs(TypedDict):
         section: QgsSettings.Section
         type: NotRequired[type]  # noqa: A003
+
+
+T = TypeVar("T", str, int, float, bool, list)
 
 
 def setting_key(*args: str) -> str:
@@ -69,12 +72,11 @@ def set_setting(
 
 def get_project_setting(
     key: str,
-    default: Optional[Any] = None,
-    typehint: Optional[type] = None,
+    default: Union[T, QVariant, None] = None,
+    typehint: Optional[type[T]] = None,
     internal: bool = True,
-) -> Union[QVariant, str, None]:
-    """
-    Get QGIS project setting value
+) -> Union[T, QVariant, str, None]:
+    """Get QGIS project setting value
 
     :param key: Key for the setting
     :param default: Optional default value
@@ -88,24 +90,27 @@ def get_project_setting(
         value = QgsExpressionContextUtils.projectScope(proj).variable(key)
         return value if value is not None else default
 
-    args = [plugin_name(), key]
-    if default is not None:
-        args.append(default)
+    args: Union[tuple[()], tuple[T]] = () if default is None else (default,)
 
-    value = None
-    conversion_ok = False
-    if typehint is not None and typehint is not str:
-        try:
-            if typehint is int:
-                value, conversion_ok = proj.readNumEntry(*args)
-            elif typehint is bool:
-                value, conversion_ok = proj.readBoolEntry(*args)
-            elif typehint is list:
-                value, conversion_ok = proj.readListEntry(*args)
-        except TypeError as e:
-            raise QgsPluginInvalidProjectSetting(str(e)) from e
-    else:
-        value, conversion_ok = proj.readEntry(*args)
+    try:
+        if typehint is None or typehint is str:
+            value, conversion_ok = proj.readEntry(plugin_name(), key, *args)
+        elif typehint is int:
+            value, conversion_ok = proj.readNumEntry(plugin_name(), key, *args)
+        elif typehint is float:
+            value, conversion_ok = proj.readDoubleEntry(plugin_name(), key, *args)
+        elif typehint is bool:
+            value, conversion_ok = proj.readBoolEntry(plugin_name(), key, *args)
+        elif typehint is list:
+            value, conversion_ok = proj.readListEntry(plugin_name(), key, *args)
+        else:
+            raise QgsPluginInvalidProjectSetting(
+                "If specified, typehint must be one of str, int, float, bool "
+                f"or list. Got {typehint.__name__} instead."
+            )
+    except TypeError as e:
+        raise QgsPluginInvalidProjectSetting(str(e)) from e
+
     return value if conversion_ok else default
 
 
