@@ -280,11 +280,11 @@ def download_to_file(
             with requests.get(url, stream=True, timeout=timeout) as r:
                 try:
                     r.raise_for_status()
-                except Exception:
+                except Exception as e:
                     raise QgsPluginNetworkException(
                         tr("Request failed with status code {}", r.status_code),
                         bar_msg=bar_msg(r.text),
-                    )
+                    ) from e
                 default_filenames = re.findall(
                     "filename=(.+)", r.headers.get(CONTENT_DISPOSITION_HEADER, "")
                 )
@@ -295,7 +295,9 @@ def download_to_file(
                 with open(output, "wb") as f:
                     shutil.copyfileobj(r.raw, f)
         except RequestException as e:
-            raise QgsPluginNetworkException(tr("Request failed"), bar_msg=bar_msg(e))
+            raise QgsPluginNetworkException(
+                tr("Request failed"), bar_msg=bar_msg(e)
+            ) from e
     else:
         # Using simple fetch_raw
         content, default_filename = fetch_raw(url, encoding)
