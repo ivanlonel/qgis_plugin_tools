@@ -92,7 +92,7 @@ zip-safe = false
 qgis_plugin_tools = "."
 
 [tool.setuptools.package-data]
-qgis_plugin_tools = [
+"*" = [
     "py.typed",
     "*.ui",
 ]
