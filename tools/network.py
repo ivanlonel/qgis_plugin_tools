@@ -202,7 +202,7 @@ def request_raw(
             byte_data = b""
         _ = request_blocking.post(req, byte_data)
     else:
-        raise Exception(f"Request method {method} not supported.")
+        raise ValueError(f"Request method {method} not supported.")
     reply: QgsNetworkReplyContent = request_blocking.reply()
     reply_error = reply.error()
     if reply_error != QNetworkReply.NetworkError.NoError:
