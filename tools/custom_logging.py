@@ -134,7 +134,7 @@ class QgsMessageBarFilter(logging.Filter):
         record.qgis_level = (  # type: ignore
             Qgis.Success if args.get("success", False) else qgis_level(record.levelname)
         )
-        record.duration = args.get("duration", self.bar_msg_duration(record.levelname))  # type: ignore # noqa E501
+        record.duration = args.get("duration", self.bar_msg_duration(record.levelname))  # type: ignore # noqa: E501
         return True
 
     @staticmethod
@@ -308,7 +308,7 @@ def _create_handlers(
     return handlers
 
 
-def setup_logger(  # noqa QGS105
+def setup_logger(  # noqa: QGS105
     logger_name: str, iface: Optional[QgisInterface] = None
 ) -> logging.Logger:
     """Run once when the module is loaded and enable logging.

@@ -91,4 +91,4 @@ def _delete_child_widgets(item: QLayoutItem) -> None:
         widget.setParent(None)
         widget = None
     del item
-    item = None  # noqa F841
+    item = None  # noqa: F841
