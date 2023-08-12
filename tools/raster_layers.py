@@ -4,8 +4,10 @@ __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
 import datetime
+from typing import TYPE_CHECKING, cast
 
 from qgis.core import (
+    Qgis,
     QgsContrastEnhancement,
     QgsDateTimeRange,
     QgsRasterBandStats,
@@ -15,10 +17,8 @@ from qgis.core import (
 )
 from qgis.PyQt.QtCore import Qt
 
-try:
+if TYPE_CHECKING:
     from qgis.core import QgsRasterLayerTemporalProperties
-except ImportError:
-    QgsRasterLayerTemporalProperties = None
 
 
 def set_raster_renderer_to_singleband(layer: QgsRasterLayer, band: int = 1) -> None:
@@ -58,9 +58,8 @@ def set_fixed_temporal_range(layer: QgsRasterLayer, t_range: QgsDateTimeRange) -
     :param layer: raster layer
     :param t_range: fixed temporal range
     """
-    mode = QgsRasterLayerTemporalProperties.ModeFixedTemporalRange
-    tprops: QgsRasterLayerTemporalProperties = layer.temporalProperties()
-    tprops.setMode(mode)
+    tprops = cast("QgsRasterLayerTemporalProperties", layer.temporalProperties())
+    tprops.setMode(Qgis.RasterTemporalMode.FixedTemporalRange)
     if t_range.begin().timeSpec() == 0 or t_range.end().timeSpec() == 0:
         begin = t_range.begin()
         end = t_range.end()
@@ -79,12 +78,12 @@ def set_band_based_on_range(layer: QgsRasterLayer, t_range: QgsDateTimeRange) ->
     :return: band number
     """
     band_num = 1
-    tprops: QgsRasterLayerTemporalProperties = layer.temporalProperties()
+    tprops = cast("QgsRasterLayerTemporalProperties", layer.temporalProperties())
     if (
         tprops.isVisibleInTemporalRange(t_range)
         and t_range.begin().isValid()
         and t_range.end().isValid()
-    ) and tprops.mode() == QgsRasterLayerTemporalProperties.ModeFixedTemporalRange:
+    ) and tprops.mode() == Qgis.RasterTemporalMode.FixedTemporalRange:
         layer_t_range: QgsDateTimeRange = tprops.fixedTemporalRange()
         start: datetime.datetime = layer_t_range.begin().toPyDateTime()
         end: datetime.datetime = layer_t_range.end().toPyDateTime()

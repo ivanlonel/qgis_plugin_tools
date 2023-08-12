@@ -6,9 +6,10 @@ __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
 import logging
-from typing import Optional, Union
+from typing import TYPE_CHECKING, Optional, Union, cast
 
 from qgis.core import (
+    Qgis,
     QgsExpression,
     QgsExpressionContext,
     QgsExpressionContextScope,
@@ -16,6 +17,7 @@ from qgis.core import (
     QgsFeature,
     QgsGeometry,
     QgsMapLayer,
+    QgsUnitTypes,
     QgsVectorLayer,
     QgsWkbTypes,
 )
@@ -24,10 +26,8 @@ from .custom_logging import bar_msg
 from .exceptions import QgsPluginExpressionException
 from .i18n import tr
 
-try:
-    from qgis.core import QgsUnitTypes, QgsVectorLayerTemporalProperties
-except ImportError:
-    QgsVectorLayerTemporalProperties = QgsUnitTypes = None
+if TYPE_CHECKING:
+    from qgis.core import QgsVectorLayerTemporalProperties
 
 LOGGER = logging.getLogger(__name__)
 
@@ -91,14 +91,12 @@ def set_temporal_settings(
     :param time_step: time step in some QgsUnitTypes.TemporalUnit
     :param unit: QgsUnitTypes.TemporalUnit
     """
-    if unit is None:
-        unit = QgsUnitTypes.TemporalUnit.TemporalMinutes
-    mode = QgsVectorLayerTemporalProperties.ModeFeatureDateTimeInstantFromField
-    tprops: QgsVectorLayerTemporalProperties = layer.temporalProperties()
-    tprops.setMode(mode)
+    tprops = cast("QgsVectorLayerTemporalProperties", layer.temporalProperties())
+    tprops.setMode(Qgis.VectorTemporalMode.FeatureDateTimeInstantFromField)
+
     tprops.setStartField(dt_field)
     tprops.setFixedDuration(time_step)
-    tprops.setDurationUnits(unit)
+    tprops.setDurationUnits(unit or QgsUnitTypes.TemporalUnit.TemporalMinutes)
     tprops.setIsActive(True)
 
 
