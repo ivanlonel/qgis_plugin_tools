@@ -1,3 +1,8 @@
+__copyright__ = "Copyright 2020-2023, Gispo Ltd"
+__license__ = "GPL version 3"
+__email__ = "info@gispo.fi"
+__revision__ = "$Format:%H$"
+
 import json
 import logging
 import re
@@ -22,11 +27,6 @@ except ImportError:
     REQUESTS_IS_AVAILABLE = False
 else:
     REQUESTS_IS_AVAILABLE = True
-
-__copyright__ = "Copyright 2020-2023, Gispo Ltd"
-__license__ = "GPL version 3"
-__email__ = "info@gispo.fi"
-__revision__ = "$Format:%H$"
 
 LOGGER = logging.getLogger(__name__)
 ENCODING = "utf-8"

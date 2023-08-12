@@ -1,15 +1,16 @@
 """QListWidget with fields selection."""
+
+__copyright__ = "Copyright 2019, 3Liz"
+__license__ = "GPL version 3"
+__email__ = "info@3liz.org"
+__revision__ = "$Format:%H$"
+
 from collections.abc import Container
 from typing import Optional
 
 from qgis.core import QgsField, QgsVectorLayer
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QListWidget, QListWidgetItem, QWidget
-
-__copyright__ = "Copyright 2019, 3Liz"
-__license__ = "GPL version 3"
-__email__ = "info@3liz.org"
-__revision__ = "$Format:%H$"
 
 
 class ListFieldsSelection(QListWidget):

@@ -1,5 +1,10 @@
 """I18n tools."""
 
+__copyright__ = "Copyright 2019, 3Liz, 2020-2021 Gispo Ltd"
+__license__ = "GPL version 3"
+__email__ = "info@3liz.org"
+__revision__ = "$Format:%H$"
+
 from os.path import join
 from typing import Any, Optional, cast
 
@@ -8,11 +13,6 @@ from qgis.PyQt.QtCore import QFileInfo, QLocale
 from qgis.PyQt.QtWidgets import QApplication
 
 from .resources import plugin_name, plugin_path, resources_path, slug_name
-
-__copyright__ = "Copyright 2019, 3Liz, 2020-2021 Gispo Ltd"
-__license__ = "GPL version 3"
-__email__ = "info@3liz.org"
-__revision__ = "$Format:%H$"
 
 
 def setup_translation(

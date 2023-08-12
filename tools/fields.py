@@ -1,3 +1,8 @@
+__copyright__ = "Copyright 2020-2021, Gispo Ltd"
+__license__ = "GPL version 3"
+__email__ = "info@gispo.fi"
+__revision__ = "$Format:%H$"
+
 from typing import Union, cast
 
 from qgis.core import QgsApplication, QgsFields
@@ -5,11 +10,6 @@ from qgis.gui import QgsDateTimeEdit, QgsDoubleSpinBox, QgsSpinBox
 from qgis.PyQt.QtCore import QVariant
 from qgis.PyQt.QtGui import QIcon
 from qgis.PyQt.QtWidgets import QCheckBox, QComboBox, QDateEdit, QWidget
-
-__copyright__ = "Copyright 2020-2021, Gispo Ltd"
-__license__ = "GPL version 3"
-__email__ = "info@gispo.fi"
-__revision__ = "$Format:%H$"
 
 
 # noinspection PyCallByClass,PyArgumentList

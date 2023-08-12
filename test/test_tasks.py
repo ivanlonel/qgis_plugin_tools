@@ -1,3 +1,7 @@
+__copyright__ = "Copyright 2021, qgis_plugin_tools contributors"
+__license__ = "GPL version 3"
+__email__ = "info@gispo.fi"
+
 import time
 from typing import Any
 
@@ -7,10 +11,6 @@ from qgis.PyQt.QtCore import QCoreApplication, QEventLoop
 from ..testing.utilities import SimpleTask, TestTaskRunner
 from ..tools.exceptions import QgsPluginException, TaskInterruptedException
 from ..tools.tasks import FunctionTask
-
-__copyright__ = "Copyright 2021, qgis_plugin_tools contributors"
-__license__ = "GPL version 3"
-__email__ = "info@gispo.fi"
 
 
 def fn(*args: Any, **kwargs: Any):

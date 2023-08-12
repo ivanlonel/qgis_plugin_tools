@@ -1,5 +1,12 @@
 """Tools to work with resource files."""
 
+__copyright__ = (
+    "Copyright 2019, 3Liz, 2020-2021 Gispo Ltd, 2022 National Land Survey of Finland"
+)
+__license__ = "GPL version 3"
+__email__ = "info@3liz.org"
+__revision__ = "$Format:%H$"
+
 import configparser
 import importlib.resources
 import inspect
@@ -8,17 +15,9 @@ from os.path import abspath, dirname, exists, join, pardir
 from pathlib import Path
 from typing import Optional
 
+from qgis.core import QgsApplication
 from qgis.PyQt import uic
 from qgis.PyQt.QtWidgets import QDialog, QWidget
-
-__copyright__ = (
-    "Copyright 2019, 3Liz, 2020-2021 Gispo Ltd, 2022 National Land Survey of Finland"
-)
-__license__ = "GPL version 3"
-__email__ = "info@3liz.org"
-__revision__ = "$Format:%H$"
-
-from qgis.core import QgsApplication
 
 PLUGIN_NAME: str = ""
 SLUG_NAME: str = ""
