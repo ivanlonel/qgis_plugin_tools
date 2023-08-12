@@ -24,10 +24,8 @@ class ListFieldsSelection(QListWidget):
 
         for field in self.layer.fields():
             cell = QListWidgetItem()
-            if alias := field.alias():
-                cell.setText(f"{field.name()} ({alias})")
-            else:
-                cell.setText(field.name())
+            alias = field.alias()
+            cell.setText(f"{field.name()} ({alias})" if alias else field.name())
             cell.setData(Qt.UserRole, field.name())
             index = layer.fields().indexFromName(field.name())
             if index >= 0:
