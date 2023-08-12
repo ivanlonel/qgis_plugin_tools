@@ -186,7 +186,7 @@ Put -h after command to see available optional arguments if any
                 echo(f"rm {fil}")
                 os.remove(fil)
 
-    def compile(self) -> None:
+    def compile(self) -> None:  # noqa: A003
         pre_args = self._get_platform_args()
         for fil in self.resources:
             if os.path.exists(fil):
