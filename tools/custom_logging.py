@@ -40,7 +40,7 @@ class LogTarget(Enum):
         return self.value["default"]
 
 
-def qgis_level(logging_level: str) -> int:
+def qgis_level(logging_level: str) -> Qgis.MessageLevel:
     """Check for the corresponding QGIS Level according to Logging Level.
 
     For QGIS:
@@ -56,10 +56,10 @@ def qgis_level(logging_level: str) -> int:
     :rtype: Qgis.MessageLevel
     """
     if logging_level in {"CRITICAL", "ERROR"}:
-        return Qgis.Critical
+        return Qgis.MessageLevel.Critical
     if logging_level == "WARNING":
-        return Qgis.Warning
-    return Qgis.Info
+        return Qgis.MessageLevel.Warning
+    return Qgis.MessageLevel.Info
 
 
 def bar_msg(
@@ -110,7 +110,9 @@ class QgsLogHandler(logging.Handler):
             ).format(self._message_log_name)
             # print(message)
             # noinspection PyCallByClass,PyTypeChecker
-            QgsMessageLog.logMessage(message, level=Qgis.Critical, **tag_kwargs)
+            QgsMessageLog.logMessage(
+                message, level=Qgis.MessageLevel.Critical, **tag_kwargs
+            )
 
 
 class QgsMessageBarFilter(logging.Filter):
@@ -132,7 +134,9 @@ class QgsMessageBarFilter(logging.Filter):
             return False
 
         record.qgis_level = (
-            Qgis.Success if args.get("success", False) else qgis_level(record.levelname)
+            Qgis.MessageLevel.Success
+            if args.get("success", False)
+            else qgis_level(record.levelname)
         )
         record.duration = args.get("duration", self.bar_msg_duration(record.levelname))
         return True
