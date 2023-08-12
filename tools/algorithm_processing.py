@@ -14,9 +14,6 @@ __revision__ = "$Format:%H$"
 
 
 class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
-    def __init__(self):
-        super().__init__()
-
     def createInstance(self):
         return type(self)()
 
