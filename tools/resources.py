@@ -125,9 +125,7 @@ def plugin_name() -> str:
         return PLUGIN_NAME
 
     try:
-        metadata = metadata_config()
-        name: str = metadata["general"]["name"]
-        name = name.replace(" ", "").strip()
+        name: str = metadata_config()["general"]["name"].replace(" ", "").strip()
     except KeyError:
         name = "test_plugin"
 
@@ -147,8 +145,7 @@ def plugin_display_name() -> str:
     :rtype: basestring
     """
     try:
-        metadata = metadata_config()
-        return metadata["general"]["name"]
+        return metadata_config()["general"]["name"]
     except KeyError:
         return "Test plugin"
 
@@ -161,9 +158,7 @@ def slug_name() -> str:
         return SLUG_NAME
 
     try:
-        metadata = metadata_config()
-        name: str = metadata["general"]["repository"]
-        slug = name.split("/")[-1]
+        slug: str = metadata_config()["general"]["repository"].split("/")[-1]
     except KeyError:
         slug = plugin_name()
 
