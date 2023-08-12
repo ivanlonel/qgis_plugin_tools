@@ -152,10 +152,9 @@ def request_raw(
     req = QNetworkRequest(QUrl(url))
     # http://osgeo-org.1560.x6.nabble.com/QGIS-Developer-Do-we-have-a-User-Agent-string-for-QGIS-td5360740.html
     user_agent = QSettings().value("/qgis/networkAndProxy/userAgent", "Mozilla/5.0")
-    user_agent += " " if len(user_agent) else ""
+    user_agent += " " if user_agent else ""
     # noinspection PyUnresolvedReferences
-    user_agent += f"QGIS/{Qgis.QGIS_VERSION_INT}"
-    user_agent += f" {plugin_name()}"
+    user_agent += f"QGIS/{Qgis.QGIS_VERSION_INT} {plugin_name()}"
     # https://www.riverbankcomputing.com/pipermail/pyqt/2016-May/037514.html
     req.setRawHeader(b"User-Agent", bytes(user_agent, encoding))
     request_blocking = QgsBlockingNetworkRequest()
@@ -213,7 +212,7 @@ def request_raw(
         raise QgsPluginNetworkException(
             message=(
                 bytes(reply.content()).decode("utf-8")
-                if len(bytes(reply.content()))
+                if bytes(reply.content())
                 else None
             ),
             error=reply_error,
@@ -282,9 +281,7 @@ def download_to_file(
                 default_filenames = re.findall(
                     "filename=(.+)", r.headers.get(CONTENT_DISPOSITION_HEADER, "")
                 )
-                default_filename = (
-                    default_filenames[0] if len(default_filenames) else ""
-                )
+                default_filename = default_filenames[0] if default_filenames else ""
                 output = get_output(default_filename)
                 with open(output, "wb") as f:
                     shutil.copyfileobj(r.raw, f)

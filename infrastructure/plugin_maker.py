@@ -417,7 +417,7 @@ Put -h after command to see available optional arguments if any
         ) as pros:
             stdout, stderr = pros.communicate()
         echo(stdout, force=force_show_output)
-        if len(stderr):
+        if stderr:
             echo(stderr, force=True)
             print(
                 "------beging of stderr----------:\n",
