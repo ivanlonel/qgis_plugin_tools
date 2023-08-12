@@ -1,5 +1,4 @@
 """Tools about version."""
-from typing import Tuple
 
 from osgeo import osr
 
@@ -24,14 +23,14 @@ def version(remove_v_prefix: bool = True) -> str:
     return v
 
 
-def proj_version() -> Tuple[int, int]:
+def proj_version() -> tuple[int, int]:
     """Returns PROJ library version"""
     major: int = osr.GetPROJVersionMajor()
     minor: int = osr.GetPROJVersionMinor()
     return major, minor
 
 
-def version_from_string(version: str) -> Tuple[int, int, int]:
+def version_from_string(version: str) -> tuple[int, int, int]:
     """
     Transforms version string in format 'x.y.z' to tuple (x,y,z) for comparisons
     :param version:
@@ -43,7 +42,7 @@ def version_from_string(version: str) -> Tuple[int, int, int]:
     return int(parts[0]), int(parts[1]), int(parts[2])
 
 
-def string_from_version(version: Tuple[int, int, int]) -> str:
+def string_from_version(version: tuple[int, int, int]) -> str:
     """
     Transforms version tuple in format (x,y,z) to string in format 'x.y.z'
     :param version:

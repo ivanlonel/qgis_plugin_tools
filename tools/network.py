@@ -3,7 +3,7 @@ import logging
 import re
 import shutil
 from pathlib import Path
-from typing import Dict, List, Literal, NamedTuple, Optional, Tuple
+from typing import Literal, NamedTuple, Optional
 from urllib.parse import urlencode
 from uuid import uuid4
 
@@ -51,7 +51,7 @@ def fetch(
     url: str,
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    params: Optional[Dict[str, str]] = None,
+    params: Optional[dict[str, str]] = None,
 ) -> str:
     """
     Fetch resource from the internet. Similar to requests.get(url) but is
@@ -70,8 +70,8 @@ def post(
     url: str,
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    data: Optional[Dict[str, str]] = None,
-    files: Optional[List[FileField]] = None,
+    data: Optional[dict[str, str]] = None,
+    files: Optional[list[FileField]] = None,
 ) -> str:
     """
     Post resource. Similar to requests.post(url, data, files) but is
@@ -91,8 +91,8 @@ def fetch_raw(
     url: str,
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    params: Optional[Dict[str, str]] = None,
-) -> Tuple[bytes, str]:
+    params: Optional[dict[str, str]] = None,
+) -> tuple[bytes, str]:
     """
     Fetch resource from the internet. Similar to requests.get(url) but is
     recommended way of handling requests in QGIS plugin
@@ -109,9 +109,9 @@ def post_raw(
     url: str,
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    data: Optional[Dict[str, str]] = None,
-    files: Optional[List[FileField]] = None,
-) -> Tuple[bytes, str]:
+    data: Optional[dict[str, str]] = None,
+    files: Optional[list[FileField]] = None,
+) -> tuple[bytes, str]:
     """
     Post resource. Similar to requests.post(url, data, files) but is
     recommended way of handling requests in QGIS plugin
@@ -130,10 +130,10 @@ def request_raw(
     method: Literal["get", "post"] = "get",
     encoding: str = ENCODING,
     authcfg_id: str = "",
-    params: Optional[Dict[str, str]] = None,
-    data: Optional[Dict[str, str]] = None,
-    files: Optional[List[FileField]] = None,
-) -> Tuple[bytes, str]:
+    params: Optional[dict[str, str]] = None,
+    data: Optional[dict[str, str]] = None,
+    files: Optional[list[FileField]] = None,
+) -> tuple[bytes, str]:
     """
     Request resource from the internet. Similar to requests.get(url) and
     requests.post(url, data) but is recommended way of handling requests in QGIS plugin

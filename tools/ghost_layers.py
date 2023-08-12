@@ -1,5 +1,4 @@
 """Tools for layers."""
-from typing import List
 
 from qgis.core import QgsLayerTreeUtils, QgsMapLayer, QgsProject
 
@@ -28,7 +27,7 @@ def is_ghost_layer(layer: QgsMapLayer) -> bool:
     return count == 0
 
 
-def remove_all_ghost_layers() -> List[QgsMapLayer]:
+def remove_all_ghost_layers() -> list[QgsMapLayer]:
     """Remove all ghost layers from project.
 
     :return: The list of layers name which have been removed.
