@@ -16,7 +16,7 @@ class ListFieldsSelection(QListWidget):
         super().__init__(parent)
         self.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.layer = None
+        self.layer: Optional[QgsVectorLayer] = None
 
     def set_layer(self, layer: QgsVectorLayer) -> None:
         self.layer = layer
