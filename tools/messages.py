@@ -39,7 +39,6 @@ class MessageBarLogger:
         :param exc_info: Exception of handled exception for capturing traceback
         :param stack_info: Whether to include stack info
         """
-
         self._logger.info(
             str(message),
             extra=bar_msg(details, duration, success),

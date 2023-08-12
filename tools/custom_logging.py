@@ -327,7 +327,6 @@ def setup_logger(  # noqa QGS105
        LOGGER.info('Some bar message', extra={'details': 'details'})
        LOGGER.info('Some bar message', extra=bar_msg('details')) # With helper function
     """
-
     if iface is None:
         try:
             from qgis.utils import iface  # type: ignore
