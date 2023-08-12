@@ -7,7 +7,15 @@ from collections.abc import Callable, Iterable
 from enum import Enum, unique
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Optional, Protocol, TypedDict, runtime_checkable
+from typing import (
+    Any,
+    Literal,
+    Optional,
+    Protocol,
+    TypedDict,
+    overload,
+    runtime_checkable,
+)
 
 from qgis.core import Qgis, QgsApplication, QgsMessageLog
 from qgis.gui import QgisInterface, QgsMessageBar
@@ -156,8 +164,28 @@ class QgsMessageBarFilter(logging.Filter):
         record.duration = args.get("duration", self.bar_msg_duration(record.levelname))
         return True
 
+    @overload
     @staticmethod
-    def bar_msg_duration(logging_level: str) -> int:
+    def bar_msg_duration(logging_level: Literal["CRITICAL"]) -> Literal[12]:
+        ...
+
+    @overload
+    @staticmethod
+    def bar_msg_duration(logging_level: Literal["ERROR"]) -> Literal[10]:
+        ...
+
+    @overload
+    @staticmethod
+    def bar_msg_duration(logging_level: Literal["WARNING"]) -> Literal[6]:
+        ...
+
+    @overload
+    @staticmethod
+    def bar_msg_duration(logging_level: str) -> Literal[4, 6, 10, 12]:
+        ...
+
+    @staticmethod
+    def bar_msg_duration(logging_level: str) -> Literal[4, 6, 10, 12]:
         """Check default duration for messages in message bar based on level.
 
         :param logging_level: The Logging level
