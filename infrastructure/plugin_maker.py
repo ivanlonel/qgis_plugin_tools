@@ -121,25 +121,29 @@ class PluginMaker:
         self,
         py_files,
         ui_files,
-        resources=RESOURCES_SRC,
-        extra_dirs=EXTRA_DIRS,
-        extras=EXTRAS,
-        compiled_resources=COMPILED_RESOURCE_FILES,
-        locales=LOCALES,
+        resources=None,
+        extra_dirs=None,
+        extras=None,
+        compiled_resources=None,
+        locales=None,
         profile=PROFILE,
         lrelease=LRELEASE,
         pyrcc=PYRCC,
         verbose=VERBOSE,
-        submodules=SUBMODULES,
+        submodules=None,
     ):
         global VERBOSE
         self.py_files = py_files
         self.ui_files = ui_files
-        self.resources = resources
-        self.extra_dirs = extra_dirs
-        self.extras = extras
-        self.compiled_resources = compiled_resources
-        self.locales = locales
+        self.resources = resources if resources is not None else RESOURCES_SRC
+        self.extra_dirs = extra_dirs if extra_dirs is not None else EXTRA_DIRS
+        self.extras = extras if extras is not None else EXTRAS
+        self.compiled_resources = (
+            compiled_resources
+            if compiled_resources is not None
+            else COMPILED_RESOURCE_FILES
+        )
+        self.locales = locales if locales is not None else LOCALES
         self.profile = profile
         self.lrelease = lrelease
         self.pyrcc = pyrcc
@@ -147,7 +151,7 @@ class PluginMaker:
         self.plugin_dir = os.path.join(
             str(Path.home()), self.qgis_dir, "python", "plugins", PLUGIN_PACKAGE_NAME
         )
-        self.submodules = submodules
+        self.submodules = submodules if submodules is not None else SUBMODULES
         VERBOSE = verbose
 
         # git-like usage https://chase-seibert.github.io/blog/2014/03/21/python-multilevel-argparse.html # noqa
