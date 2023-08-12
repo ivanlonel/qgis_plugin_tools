@@ -20,8 +20,8 @@ try:
     import requests
     from requests.exceptions import RequestException
 except ImportError:
-    requests = None  # type: ignore
-    RequestException = None  # type: ignore
+    requests = None
+    RequestException = None
 
 __copyright__ = "Copyright 2020-2023, Gispo Ltd"
 __license__ = "GPL version 3"

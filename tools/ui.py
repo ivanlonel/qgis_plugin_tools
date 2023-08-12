@@ -27,7 +27,7 @@ def load_ui_file(package: importlib.resources.Package, ui_file_name: str) -> Any
     autocomplete for the implementation methods:
 
     ```
-    class MyImplementation(MyUi):  # type: ignore
+    class MyImplementation(MyUi):
         def __init__(self):
             super().__init__()  # Pylance will show QDockWidget init signature
     ```
