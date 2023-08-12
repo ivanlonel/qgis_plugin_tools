@@ -1,4 +1,3 @@
-# flake8: noqa N802
 """Base class algorithm."""
 from os.path import isfile
 
@@ -14,15 +13,15 @@ __revision__ = "$Format:%H$"
 
 
 class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
-    def createInstance(self):
+    def createInstance(self) -> "BaseProcessingAlgorithm":  # noqa: N802
         return type(self)()
 
-    def flags(self):
+    def flags(self) -> QgsProcessingAlgorithm.Flags:
         return super().flags() | QgsProcessingAlgorithm.FlagHideFromModeler
 
-    def icon(self):
+    def icon(self) -> QIcon:
         icon = resources_path("icons", "icon.png")
         return QIcon(icon) if isfile(icon) else super().icon()
 
-    def shortHelpString(self):
+    def shortHelpString(self) -> str:  # noqa: N802
         raise NotImplementedError

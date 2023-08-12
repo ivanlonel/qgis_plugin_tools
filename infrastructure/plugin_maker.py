@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-# flake8: noqa
 import argparse
 import os
 import shutil
 import subprocess  # nosec: B404
 import sys
 from argparse import ArgumentParser
+from collections.abc import Iterable, Sequence
 from pathlib import Path
+from typing import Any, Optional, Union
 from zipfile import ZipFile
 
 from ..tools.resources import plugin_name, plugin_path, resources_path
@@ -17,7 +18,7 @@ __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
 
 
-def is_windows():
+def is_windows() -> bool:
     return "win" in sys.platform and "darwin" not in sys.platform
 
 
@@ -111,7 +112,7 @@ else:
 VERBOSE = False
 
 
-def echo(*args, **kwargs):
+def echo(*args: Any, **kwargs: Any) -> None:
     if VERBOSE or kwargs.get("force", False):
         print(*args)
 
@@ -119,19 +120,19 @@ def echo(*args, **kwargs):
 class PluginMaker:
     def __init__(
         self,
-        py_files,
-        ui_files,
-        resources=None,
-        extra_dirs=None,
-        extras=None,
-        compiled_resources=None,
-        locales=None,
-        profile=PROFILE,
-        lrelease=LRELEASE,
-        pyrcc=PYRCC,
-        verbose=VERBOSE,
-        submodules=None,
-    ):
+        py_files: list[str],
+        ui_files: list[str],
+        resources: Optional[list[str]] = None,
+        extra_dirs: Optional[list[str]] = None,
+        extras: Optional[list[str]] = None,
+        compiled_resources: Optional[list[str]] = None,
+        locales: Optional[list[str]] = None,
+        profile: str = PROFILE,
+        lrelease: str = LRELEASE,
+        pyrcc: str = PYRCC,
+        verbose: Optional[bool] = None,
+        submodules: Optional[list[str]] = None,
+    ) -> None:
         global VERBOSE
         self.py_files = py_files
         self.ui_files = ui_files
@@ -179,13 +180,13 @@ Put -h after command to see available optional arguments if any
         # use dispatch pattern to invoke method with same name
         getattr(self, args.command)()
 
-    def clean(self):
+    def clean(self) -> None:
         for fil in self.compiled_resources:
             if os.path.exists(fil):
                 echo(f"rm {fil}")
                 os.remove(fil)
 
-    def compile(self):
+    def compile(self) -> None:
         pre_args = self._get_platform_args()
         for fil in self.resources:
             if os.path.exists(fil):
@@ -194,10 +195,10 @@ Put -h after command to see available optional arguments if any
             else:
                 raise ValueError(f"The expected resource file {fil} is missing!")
 
-    def _get_platform_args(self):
+    def _get_platform_args(self) -> list[str]:
         return ["cmd", "/c"] if is_windows() else []  # noqa W605
 
-    def deploy(self):
+    def deploy(self) -> None:
         self.compile()
         dst_dir = f"{self.plugin_dir}/"
         os.makedirs(self.plugin_dir, exist_ok=True)
@@ -212,7 +213,7 @@ Put -h after command to see available optional arguments if any
         self.cp_parents(dst_dir, self.py_files)
         self.cp_parents(dst_dir, self.ui_files)
 
-    def package(self):
+    def package(self) -> None:
         parser = ArgumentParser()
         parser.add_argument(
             "--version",
@@ -263,7 +264,7 @@ Put -h after command to see available optional arguments if any
         self.join_zips(zips)
         echo(f"Created package: {PLUGINNAME}.zip")
 
-    def start_ide(self):
+    def start_ide(self) -> None:
         if not is_windows():
             print(
                 "This command is only meant to run on Windows environment with QGIS < 3.16.8."
@@ -328,7 +329,7 @@ Put -h after command to see available optional arguments if any
             ) as process:
                 process.communicate(script)
 
-    def transup(self):
+    def transup(self) -> None:
         files_to_translate = self.py_files + self.ui_files
         for locale in self.locales:
             ts_file = os.path.join(resources_path("i18n"), f"{locale}.ts")
@@ -340,7 +341,7 @@ Put -h after command to see available optional arguments if any
             )
             self.run_command(args, force_show_output=True)
 
-    def transcompile(self):
+    def transcompile(self) -> None:
         pre_args = self._get_platform_args()
         for locale in self.locales:
             fil = os.path.join(resources_path("i18n"), f"{locale}.ts")
@@ -348,7 +349,7 @@ Put -h after command to see available optional arguments if any
             args = pre_args + [self.lrelease, fil]
             self.run_command(args, force_show_output=True)
 
-    def venv(self):
+    def venv(self) -> None:
         try:
             pass
         except ImportError:
@@ -398,7 +399,11 @@ Put -h after command to see available optional arguments if any
             process.communicate(script)
 
     @staticmethod
-    def run_command(args, d=None, force_show_output=False):
+    def run_command(
+        args: Sequence[str],
+        d: Optional[Union[str, os.PathLike[str]]] = None,
+        force_show_output: bool = False,
+    ) -> None:
         cmd = " ".join(args)
         if d is not None:
             cmd = f"cd {d} && {cmd}"
@@ -422,22 +427,25 @@ Put -h after command to see available optional arguments if any
             raise ValueError("Stopping now due to error in stderr!")
 
     @staticmethod
-    def cp_parents(target_dir, files):
+    def cp_parents(
+        target_dir: Union[str, os.PathLike[str]],
+        files: Iterable[Union[str, os.PathLike[str]]],
+    ) -> None:
         """https://stackoverflow.com/a/15340518"""
         dirs = [os.path.dirname(file) for file in files]
         dirs.sort(reverse=True)
         for i in range(len(dirs)):
             if dirs[i] + os.sep not in dirs[i - 1]:
-                need_dir = os.path.normpath(target_dir + dirs[i])
+                need_dir = os.path.normpath(os.path.join(target_dir, dirs[i]))
                 echo("mkdir", need_dir)
                 os.makedirs(need_dir, exist_ok=True)
         for file in files:
-            dest = os.path.normpath(target_dir + file)
+            dest = os.path.normpath(os.path.join(target_dir, file))
             echo(f"cp {file} {dest}")
             shutil.copy(file, dest)
 
     @staticmethod
-    def join_zips(zips):
+    def join_zips(zips: Sequence) -> None:
         """
         https://stackoverflow.com/a/10593823/10068922
 

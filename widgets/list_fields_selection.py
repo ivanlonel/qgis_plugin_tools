@@ -1,8 +1,9 @@
 """QListWidget with fields selection."""
-# flake8: noqa ANN001, ANN204, ANN201
+from typing import Optional
+
 from qgis.core import QgsVectorLayer
 from qgis.PyQt.QtCore import Qt
-from qgis.PyQt.QtWidgets import QAbstractItemView, QListWidget, QListWidgetItem
+from qgis.PyQt.QtWidgets import QAbstractItemView, QListWidget, QListWidgetItem, QWidget
 
 __copyright__ = "Copyright 2019, 3Liz"
 __license__ = "GPL version 3"
@@ -11,13 +12,13 @@ __revision__ = "$Format:%H$"
 
 
 class ListFieldsSelection(QListWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.layer = None
 
-    def set_layer(self, layer: QgsVectorLayer):
+    def set_layer(self, layer: QgsVectorLayer) -> None:
         self.layer = layer
 
         self.clear()
@@ -32,7 +33,7 @@ class ListFieldsSelection(QListWidget):
                 cell.setIcon(self.layer.fields().iconForField(index))
             self.addItem(cell)
 
-    def set_selection(self, fields: tuple):
+    def set_selection(self, fields: tuple) -> None:
         for i in range(self.count()):
             item = self.item(i)
             item.setSelected(item.data(Qt.ItemDataRole.UserRole) in fields)
