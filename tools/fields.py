@@ -16,24 +16,24 @@ __revision__ = "$Format:%H$"
 def variant_type_icon(field_type: QVariant) -> QIcon:
     if field_type == QVariant.Type.Bool:
         return QgsApplication.getThemeIcon("/mIconFieldBool.svg")
-    elif field_type in [
+    if field_type in {
         QVariant.Type.Int,
         QVariant.Type.UInt,
         QVariant.Type.LongLong,
         QVariant.Type.ULongLong,
-    ]:
+    }:
         return QgsApplication.getThemeIcon("/mIconFieldInteger.svg")
-    elif field_type == QVariant.Type.Double:
+    if field_type == QVariant.Type.Double:
         return QgsApplication.getThemeIcon("/mIconFieldFloat.svg")
-    elif field_type == QVariant.Type.String:
+    if field_type == QVariant.Type.String:
         return QgsApplication.getThemeIcon("/mIconFieldText.svg")
-    elif field_type == QVariant.Type.Date:
+    if field_type == QVariant.Type.Date:
         return QgsApplication.getThemeIcon("/mIconFieldDate.svg")
-    elif field_type == QVariant.Type.DateTime:
+    if field_type == QVariant.Type.DateTime:
         return QgsApplication.getThemeIcon("/mIconFieldDateTime.svg")
-    elif field_type == QVariant.Type.Time:
+    if field_type == QVariant.Type.Time:
         return QgsApplication.getThemeIcon("/mIconFieldTime.svg")
-    elif field_type == QVariant.Type.ByteArray:
+    if field_type == QVariant.Type.ByteArray:
         return QgsApplication.getThemeIcon("/mIconFieldBinary.svg")
     else:
         return QIcon()
@@ -45,26 +45,26 @@ def widget_for_field(field_type: QVariant) -> QWidget:
 
     if field_type == QVariant.Type.Bool:
         return QCheckBox()
-    elif field_type in [
+    if field_type in {
         QVariant.Type.Int,
         QVariant.Type.UInt,
         QVariant.Type.LongLong,
         QVariant.Type.ULongLong,
-    ]:
+    }:
         spin_box = QgsSpinBox()
         spin_box.setMaximum(2147483647)
         return spin_box
-    elif field_type == QVariant.Type.Double:
+    if field_type == QVariant.Type.Double:
         spin_box = QgsDoubleSpinBox()
         spin_box.setMaximum(2147483647)
         return spin_box
-    elif field_type == QVariant.Type.String:
+    if field_type == QVariant.Type.String:
         return q_combo_box
-    elif field_type == QVariant.Type.Date:
+    if field_type == QVariant.Type.Date:
         return QDateEdit()
-    elif field_type in {QVariant.Type.DateTime, QVariant.Type.Time}:
+    if field_type in {QVariant.Type.DateTime, QVariant.Type.Time}:
         return QgsDateTimeEdit()
-    elif field_type == QVariant.Type.ByteArray:
+    if field_type == QVariant.Type.ByteArray:
         return q_combo_box
     else:
         return q_combo_box
@@ -73,14 +73,13 @@ def widget_for_field(field_type: QVariant) -> QWidget:
 def value_for_widget(widget: type[QWidget]) -> Union[str, bool, float, int]:
     if isinstance(widget, QComboBox):
         return widget.currentText()
-    elif isinstance(widget, QCheckBox):
+    if isinstance(widget, QCheckBox):
         return widget.isChecked()
-    elif isinstance(widget, QgsDateTimeEdit):
+    if isinstance(widget, QgsDateTimeEdit):
         return widget.dateTime().toString("yyyy-MM-dd hh:mm:ss")
-    elif isinstance(widget, (QgsSpinBox, QgsDoubleSpinBox)):
+    if isinstance(widget, (QgsSpinBox, QgsDoubleSpinBox)):
         return widget.value()
-    else:
-        return str(widget.text())
+    return str(widget.text())
 
 
 def provider_fields(fields: QgsFields) -> QgsFields:
