@@ -46,7 +46,7 @@ def setup_pydevd(host: str = "localhost", port: int = 5678) -> bool:
 
             pydevd.settrace(host, port=port, stdoutToServer=True, stderrToServer=True)
             succeeded = True
-        except Exception as e:
+        except Exception as e:  # noqa: PIE786
             print(f"Unable to create pydevd debugger: {e}")
 
     return succeeded
@@ -90,7 +90,7 @@ def setup_ptvsd(host: str = "localhost", port: int = 5678) -> bool:
 
             ptvsd.enable_attach((host, port))
             succeeded = True
-        except Exception as e:
+        except Exception as e:  # noqa: PIE786
             print(f"Unable to create ptvsd debugger: {e}")
     return succeeded
 
@@ -134,7 +134,7 @@ def setup_debugpy(host: str = "localhost", port: int = 5678) -> bool:
             debugpy.configure(python=shutil.which("python"))
             debugpy.listen((host, port))
             succeeded = True
-        except Exception as e:
+        except Exception as e:  # noqa: PIE786
             print(f"Unable to create debugpy debugger: {e}")
         else:
             # extra guard for debugpy not to setup it twice
