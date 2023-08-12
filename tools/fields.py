@@ -28,9 +28,7 @@ def variant_type_icon(field_type: QVariant) -> QIcon:
         QVariant.Type.ByteArray: "/mIconFieldBinary.svg",
     }
     file_name = type_icons.get(field_type)
-    if file_name is None:
-        return QIcon()
-    return QgsApplication.getThemeIcon(file_name)
+    return QIcon() if file_name is None else QgsApplication.getThemeIcon(file_name)
 
 
 def widget_for_field(field_type: QVariant) -> QWidget:
