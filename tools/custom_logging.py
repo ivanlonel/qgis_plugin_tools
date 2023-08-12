@@ -205,9 +205,9 @@ class QgsMessageBarHandler(logging.Handler):
         """
         self._message_bar_proxy.emit_message(
             record.message,
-            record.details,
-            record.qgis_level,
-            record.duration,
+            record.details,  # type: ignore[attr-defined]
+            record.qgis_level,  # type: ignore[attr-defined]
+            record.duration,  # type: ignore[attr-defined]
         )
 
 
