@@ -7,6 +7,10 @@ import os
 import shutil
 import sys
 
+from qgis.core import QgsMessageLog
+
+from ..tools.resources import plugin_name
+
 
 def _check_if_should_setup() -> bool:
     """Check whether to connect to debug server or not"""
@@ -47,7 +51,9 @@ def setup_pydevd(host: str = "localhost", port: int = 5678) -> bool:
             pydevd.settrace(host, port=port, stdoutToServer=True, stderrToServer=True)
             succeeded = True
         except Exception as e:  # noqa: PIE786
-            print(f"Unable to create pydevd debugger: {e}")
+            QgsMessageLog.logMessage(
+                f"Unable to create pydevd debugger: {e}", tag=plugin_name()
+            )
 
     return succeeded
 
@@ -91,7 +97,9 @@ def setup_ptvsd(host: str = "localhost", port: int = 5678) -> bool:
             ptvsd.enable_attach((host, port))
             succeeded = True
         except Exception as e:  # noqa: PIE786
-            print(f"Unable to create ptvsd debugger: {e}")
+            QgsMessageLog.logMessage(
+                f"Unable to create ptvsd debugger: {e}", tag=plugin_name()
+            )
     return succeeded
 
 
@@ -135,7 +143,9 @@ def setup_debugpy(host: str = "localhost", port: int = 5678) -> bool:
             debugpy.listen((host, port))
             succeeded = True
         except Exception as e:  # noqa: PIE786
-            print(f"Unable to create debugpy debugger: {e}")
+            QgsMessageLog.logMessage(
+                f"Unable to create debugpy debugger: {e}", tag=plugin_name()
+            )
         else:
             # extra guard for debugpy not to setup it twice
             # (causes debugging session to hang)
