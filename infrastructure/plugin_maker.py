@@ -318,15 +318,15 @@ Put -h after command to see available optional arguments if any
                     f"You can move the file whenever you want."
                 )
         else:
-            process = subprocess.Popen(  # nosec: B607
+            with subprocess.Popen(  # nosec: B607
                 "cmd.exe",
                 shell=False,  # nosec: B603
                 universal_newlines=True,
                 stdin=subprocess.PIPE,
                 stdout=sys.stdout,
                 stderr=sys.stderr,
-            )
-            process.communicate(script)
+            ) as process:
+                process.communicate(script)
 
     def transup(self):
         files_to_translate = self.py_files + self.ui_files
@@ -386,7 +386,7 @@ Put -h after command to see available optional arguments if any
             requirements=requirements,
         )
 
-        process = subprocess.Popen(
+        with subprocess.Popen(
             "cmd.exe" if is_windows() else "sh",
             shell=False,  # nosec: B603
             universal_newlines=True,
@@ -394,8 +394,8 @@ Put -h after command to see available optional arguments if any
             stdout=sys.stdout,
             stderr=sys.stderr,
             env=env,
-        )
-        process.communicate(script)
+        ) as process:
+            process.communicate(script)
 
     @staticmethod
     def run_command(args, d=None, force_show_output=False):
@@ -403,14 +403,14 @@ Put -h after command to see available optional arguments if any
         if d is not None:
             cmd = f"cd {d} && {cmd}"
         echo(cmd, force=force_show_output)
-        pros = subprocess.Popen(  # nosec: B603
+        with subprocess.Popen(  # nosec: B603
             args,
             cwd=d,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             universal_newlines=True,
-        )
-        stdout, stderr = pros.communicate()
+        ) as pros:
+            stdout, stderr = pros.communicate()
         echo(stdout, force=force_show_output)
         if len(stderr):
             echo(stderr, force=True)
@@ -446,6 +446,7 @@ Put -h after command to see available optional arguments if any
         """
         with ZipFile(zips[0], "a") as z1:
             for fname in zips[1:]:
-                zf = ZipFile(fname, "r")
-                for n in zf.namelist():
-                    z1.writestr(n, zf.open(n).read())
+                with ZipFile(fname, "r") as zf:
+                    for n in zf.namelist():
+                        with zf.open(n) as fd:
+                            z1.writestr(n, fd.read())
