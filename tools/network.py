@@ -18,10 +18,10 @@ from .custom_logging import bar_msg
 
 try:
     import requests
-    from requests.exceptions import RequestException
 except ImportError:
-    requests = None
-    RequestException = None
+    REQUESTS_IS_AVAILABLE = False
+else:
+    REQUESTS_IS_AVAILABLE = True
 
 __copyright__ = "Copyright 2020-2023, Gispo Ltd"
 __license__ = "GPL version 3"
@@ -266,7 +266,7 @@ def download_to_file(
 
     output = Path()
 
-    if use_requests_if_available and requests is not None:
+    if use_requests_if_available and REQUESTS_IS_AVAILABLE:
         # https://stackoverflow.com/a/39217788/10068922
 
         try:
@@ -285,7 +285,7 @@ def download_to_file(
                 output = get_output(default_filename)
                 with open(output, "wb") as f:
                     shutil.copyfileobj(r.raw, f)
-        except RequestException as e:
+        except requests.exceptions.RequestException as e:
             raise QgsPluginNetworkException(
                 tr("Request failed"), bar_msg=bar_msg(e)
             ) from e
