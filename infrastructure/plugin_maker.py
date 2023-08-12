@@ -202,12 +202,12 @@ Put -h after command to see available optional arguments if any
         self.compile()
         dst_dir = f"{self.plugin_dir}/"
         os.makedirs(self.plugin_dir, exist_ok=True)
-        for dr in self.extra_dirs:
-            echo(f"cp -R --parents {dr} {dst_dir}")
-            dst = os.path.join(self.plugin_dir, dr)
+        for extra_dir in self.extra_dirs:
+            echo(f"cp -R --parents {extra_dir} {dst_dir}")
+            dst = os.path.join(self.plugin_dir, extra_dir)
             if os.path.exists(dst):
                 shutil.rmtree(dst)
-            shutil.copytree(dr, dst)
+            shutil.copytree(extra_dir, dst)
         self.cp_parents(dst_dir, self.extras)
         self.cp_parents(dst_dir, self.compiled_resources)
         self.cp_parents(dst_dir, self.py_files)

@@ -30,6 +30,7 @@ def proj_version() -> tuple[int, int]:
     return major, minor
 
 
+# pylint: disable-next=redefined-outer-name
 def version_from_string(version: str) -> tuple[int, int, int]:
     """
     Transforms version string in format 'x.y.z' to tuple (x,y,z) for comparisons
@@ -42,6 +43,7 @@ def version_from_string(version: str) -> tuple[int, int, int]:
     return int(parts[0]), int(parts[1]), int(parts[2])
 
 
+# pylint: disable-next=redefined-outer-name
 def string_from_version(version: tuple[int, int, int]) -> str:
     """
     Transforms version tuple in format (x,y,z) to string in format 'x.y.z'
