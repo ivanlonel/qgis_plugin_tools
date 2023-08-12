@@ -1,7 +1,8 @@
 """QListWidget with layers selection."""
+from collections.abc import Container
 from typing import Optional
 
-from qgis.core import QgsMapLayerModel, QgsMapLayerType, QgsProject
+from qgis.core import QgsMapLayer, QgsMapLayerModel, QgsMapLayerType, QgsProject
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtWidgets import QAbstractItemView, QListWidget, QListWidgetItem, QWidget
 
@@ -12,7 +13,7 @@ __revision__ = "$Format:%H$"
 
 
 class ListLayersSelection(QListWidget):
-    def __init__(self, parent: QWidget = None) -> None:
+    def __init__(self, parent: Optional[QWidget] = None) -> None:
         super().__init__(parent)
         self.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
         self.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -36,7 +37,7 @@ class ListLayersSelection(QListWidget):
             cell.setIcon(QgsMapLayerModel.iconForLayer(layer))
             self.addItem(cell)
 
-    def set_selection(self, layers: tuple) -> None:
+    def set_selection(self, layers: Container[QgsMapLayer]) -> None:
         for i in range(self.count()):
             item = self.item(i)
             item.setSelected(item.data(Qt.ItemDataRole.UserRole) in layers)
