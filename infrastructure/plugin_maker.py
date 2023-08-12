@@ -307,7 +307,7 @@ Put -h after command to see available optional arguments if any
         )
 
         if args.save_to_disk:
-            with open(Path(ROOT_DIR) / "start_ide.bat", "w") as f:
+            with open(Path(ROOT_DIR) / "start_ide.bat", "w", encoding="utf8") as f:
                 f.write(script)
                 print(
                     f"Script saved successfully to {f.name}. "

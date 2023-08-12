@@ -34,7 +34,7 @@ def test_read_init():
     metadata = []
     parser = configparser.ConfigParser()
     parser.optionxform = str
-    parser.read(file_path)
+    parser.read(file_path, encoding="utf8")
     message = f'Cannot find a section named "general" in {file_path}'
     assert parser.has_section("general"), message
     metadata.extend(parser.items("general"))
