@@ -339,11 +339,13 @@ def setup_logger(  # noqa: QGS105
     if iface is None:
         try:
             # pylint: disable-next=import-outside-toplevel
-            from qgis.utils import iface
+            from qgis.utils import iface as _iface
         except ImportError:
-            iface = None
+            _iface = None
+    else:
+        _iface = iface
 
-    message_bar = iface.messageBar() if iface is not None else None
+    message_bar = _iface.messageBar() if _iface is not None else None
     # keep api stable and create the handlers as if the passed logger name
     # was plugin_name()
     handlers = _create_handlers(plugin_name(), message_bar)
@@ -436,12 +438,10 @@ def setup_loggers(
     the returned callback in unload.
     """
     if message_bar is None:
-        try:
+        with contextlib.suppress(ImportError):
             from qgis.utils import iface  # pylint: disable=import-outside-toplevel
 
-            message_bar = iface.messageBar()
-        except ImportError:
-            message_bar = None
+            message_bar = iface.messageBar() if iface is not None else None
 
     handlers = _create_handlers(message_log_name, message_bar)
 
