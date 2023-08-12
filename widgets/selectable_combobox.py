@@ -1,8 +1,8 @@
 """QCombobox with checkbox for selecting multiple items."""
 from collections.abc import Container
-from typing import Optional
+from typing import Optional, cast
 
-from qgis.core import QgsMapLayer, QgsMapLayerType
+from qgis.core import QgsMapLayer, QgsMapLayerType, QgsVectorLayer
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QAbstractButton, QComboBox, QStyledItemDelegate
@@ -73,10 +73,10 @@ class CheckableFieldComboBox(CheckableComboBox):
     def __init__(
         self, combobox: QComboBox, select_all: Optional[QAbstractButton] = None
     ) -> None:
-        self.layer = None
+        self.layer: Optional[QgsVectorLayer] = None
         super().__init__(combobox, select_all)
 
-    def set_layer(self, layer: QgsMapLayer) -> None:
+    def set_layer(self, layer: Optional[QgsMapLayer]) -> None:
         self.model.clear()
 
         if not layer:
@@ -84,7 +84,7 @@ class CheckableFieldComboBox(CheckableComboBox):
         if layer.type() != QgsMapLayerType.VectorLayer:
             return
 
-        self.layer = layer
+        self.layer = cast(QgsVectorLayer, layer)
 
         for i, field in enumerate(self.layer.fields()):
             alias = field.alias()
