@@ -2,7 +2,7 @@
 from collections.abc import Container
 from typing import Optional
 
-from qgis.core import QgsMapLayer
+from qgis.core import QgsMapLayer, QgsMapLayerType
 from qgis.PyQt.QtCore import Qt
 from qgis.PyQt.QtGui import QStandardItem, QStandardItemModel
 from qgis.PyQt.QtWidgets import QAbstractButton, QComboBox, QStyledItemDelegate
@@ -81,7 +81,7 @@ class CheckableFieldComboBox(CheckableComboBox):
 
         if not layer:
             return
-        if layer.type() != QgsMapLayer.VectorLayer:
+        if layer.type() != QgsMapLayerType.VectorLayer:
             return
 
         self.layer = layer

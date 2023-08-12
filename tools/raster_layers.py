@@ -35,14 +35,16 @@ def set_raster_renderer_to_singleband(layer: QgsRasterLayer, band: int = 1) -> N
     )
 
     stats: QgsRasterBandStats = provider.bandStatistics(
-        band, QgsRasterBandStats.All, layer.extent(), 0
+        band, QgsRasterBandStats.Stats.All, layer.extent(), 0
     )
     min_val = max(stats.minimumValue, 0)
     max_val = max(stats.maximumValue, 0)
 
     enhancement = QgsContrastEnhancement(renderer.dataType(band))
-    contrast_enhancement = QgsContrastEnhancement.StretchToMinimumMaximum
-    enhancement.setContrastEnhancementAlgorithm(contrast_enhancement, True)
+    enhancement.setContrastEnhancementAlgorithm(
+        QgsContrastEnhancement.ContrastEnhancementAlgorithm.StretchToMinimumMaximum,
+        True,
+    )
     enhancement.setMinimumValue(min_val)
     enhancement.setMaximumValue(max_val)
     layer.setRenderer(renderer)
