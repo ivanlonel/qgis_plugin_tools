@@ -251,7 +251,10 @@ def get_log_level_name(target: LogTarget) -> str:
 
 def get_log_level(target: LogTarget) -> int:
     """Finds log level of the target"""
-    return logging.getLevelName(get_log_level_name(target))
+    level = logging.getLevelName(get_log_level_name(target))
+    if not isinstance(level, int):
+        raise ValueError(f"No predefined log level found for key {target.id}")
+    return level
 
 
 def get_log_folder() -> Path:
