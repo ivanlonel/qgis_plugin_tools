@@ -155,7 +155,7 @@ class PluginMaker:
         self.submodules = submodules if submodules is not None else SUBMODULES
         VERBOSE = verbose
 
-        # git-like usage https://chase-seibert.github.io/blog/2014/03/21/python-multilevel-argparse.html # noqa
+        # git-like usage https://chase-seibert.github.io/blog/2014/03/21/python-multilevel-argparse.html
         usage = f"""build.py <command> [<args>]
 Commands:
      clean          Cleans resources

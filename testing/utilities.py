@@ -3,7 +3,7 @@
 import os
 import time
 import warnings
-from typing import Union
+from typing import NoReturn, Union
 
 from qgis.core import QgsApplication, QgsTask
 from qgis.PyQt.QtCore import QCoreApplication
@@ -12,7 +12,7 @@ from ..tools.exceptions import QgsPluginNotImplementedException
 from ..tools.tasks import BaseTask
 
 
-def get_qgis_app():  # noqa
+def get_qgis_app() -> NoReturn:
     warnings.warn(
         "get_qgis_app() is deprecated. Use library pytest-qgis instead.",
         DeprecationWarning,
