@@ -11,26 +11,26 @@ requires-python = ">=3.9"
 license = {file = "LICENSE"}
 keywords = ["qgis", "QGIS", "PyQGIS"]
 authors = [
-    {name = "3Liz"},
-    {name = "Gispo Ltd.", email = "info@gispo.fi"},
+  {name = "3Liz"},
+  {name = "Gispo Ltd.", email = "info@gispo.fi"},
 ]
 maintainers = [
-    {name = "Gispo Ltd.", email = "info@gispo.fi"},
+  {name = "Gispo Ltd.", email = "info@gispo.fi"},
 ]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
-    "Operating System :: OS Independent",
-    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Operating System :: OS Independent",
+  "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
 ]
 
 [project.optional-dependencies]
@@ -93,8 +93,8 @@ qgis_plugin_tools = "."
 
 [tool.setuptools.package-data]
 "*" = [
-    "py.typed",
-    "*.ui",
+  "py.typed",
+  "*.ui",
 ]
 
 [tool.bandit]
@@ -146,9 +146,6 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = "qgis_plugin_tools.test.*"
 disallow_untyped_defs = false
-
-[tool.pycln]
-all = true
 
 [tool.pylint.messages_control]
 disable = [
