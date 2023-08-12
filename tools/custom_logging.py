@@ -6,7 +6,7 @@ import logging
 from enum import Enum, unique
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, TypedDict
 
 from qgis.core import Qgis, QgsApplication, QgsMessageLog
 from qgis.gui import QgisInterface, QgsMessageBar
@@ -21,6 +21,12 @@ __copyright__ = "Copyright 2020-2021, Gispo Ltd"
 __license__ = "GPL version 3"
 __email__ = "info@gispo.fi"
 __revision__ = "$Format:%H$"
+
+
+class BarMsg(TypedDict, total=False):
+    details: str
+    success: bool
+    duration: int
 
 
 @unique
@@ -64,7 +70,7 @@ def qgis_level(logging_level: str) -> Qgis.MessageLevel:
 
 def bar_msg(
     details: Any = "", duration: Optional[int] = None, success: bool = False
-) -> dict[str, Any]:
+) -> BarMsg:
     """
     Helper function to construct extra arguments for message bar logger message
 
@@ -74,7 +80,7 @@ def bar_msg(
         by the user.
     :param success: Whether the message is success message or not
     """
-    args = {"details": str(details), "success": success}
+    args: BarMsg = {"details": str(details), "success": success}
     if duration is not None:
         args["duration"] = duration
     return args
