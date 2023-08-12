@@ -19,7 +19,7 @@ def log_if_fails(fn: Callable) -> Callable:
     from functools import wraps
 
     @wraps(fn)
-    def wrapper(*args: Any, **kwargs: Any) -> None:  # noqa: ANN001
+    def wrapper(*args: Any, **kwargs: Any) -> None:
         try:
             # Qt injects False into some signals
             if args[1:] != (False,):
@@ -39,7 +39,7 @@ def taskify(fn: Callable) -> Callable:
     from functools import wraps
 
     @wraps(fn)
-    def wrapper(*args: Any, **kwargs: Any) -> FunctionTask:  # noqa: ANN001
+    def wrapper(*args: Any, **kwargs: Any) -> FunctionTask:
         return FunctionTask(lambda: fn(*args, **kwargs))
 
     return wrapper
