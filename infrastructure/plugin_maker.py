@@ -130,7 +130,7 @@ class PluginMaker:
         profile: str = PROFILE,
         lrelease: str = LRELEASE,
         pyrcc: str = PYRCC,
-        verbose: Optional[bool] = None,
+        verbose: bool = False,
         submodules: Optional[list[str]] = None,
     ) -> None:
         global VERBOSE  # pylint: disable=global-statement
