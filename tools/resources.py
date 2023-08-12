@@ -1,4 +1,5 @@
 """Tools to work with resource files."""
+
 import configparser
 import importlib.resources
 import sys
@@ -23,7 +24,7 @@ SLUG_NAME: str = ""
 
 
 _TOP_LEVEL_NAME = __name__.split(".", maxsplit=1)[0]
-_IS_SUBMODULE_USAGE = not _TOP_LEVEL_NAME == "qgis_plugin_tools"
+_IS_SUBMODULE_USAGE = _TOP_LEVEL_NAME != "qgis_plugin_tools"
 
 
 def _plugin_path_submodule() -> str:
