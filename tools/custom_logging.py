@@ -3,10 +3,11 @@
 import contextlib
 import functools
 import logging
+from collections.abc import Callable
 from enum import Enum, unique
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
-from typing import Any, Callable, Optional, TypedDict
+from typing import Any, Optional, TypedDict
 
 from qgis.core import Qgis, QgsApplication, QgsMessageLog
 from qgis.gui import QgisInterface, QgsMessageBar
