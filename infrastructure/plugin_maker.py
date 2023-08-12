@@ -363,7 +363,8 @@ Put -h after command to see available optional arguments if any
 
     def venv(self) -> None:
         try:
-            pass
+            # pylint: disable-next=unused-import,import-outside-toplevel
+            from qgis.core import QgsVectorLayer  # noqa: F401
         except ImportError:
             print("Your python environment has no access to QGIS libraries!")
             return
