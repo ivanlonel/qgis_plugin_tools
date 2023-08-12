@@ -46,7 +46,7 @@ def set_setting(
     value: Union[str, int, float, bool],
     internal: bool = True,
     section: QgsSettings.Section = QgsSettings.Section.NoSection,
-) -> bool:
+) -> None:
     """
     Set a value in the QgsSetting
 
@@ -55,8 +55,7 @@ def set_setting(
     :param internal: Whether to search from only plugin settings or all
     :param section: Section argument can be used to set a value to a specific Section
     """
-    qs = QgsSettings()
-    return qs.setValue(setting_key(key) if internal else key, value, section)
+    QgsSettings().setValue(setting_key(key) if internal else key, value, section)
 
 
 def get_project_setting(
