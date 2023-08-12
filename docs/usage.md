@@ -157,7 +157,6 @@ populate it like following:
 
 ```python
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import glob
 
 from qgis_plugin_tools.infrastructure.plugin_maker import PluginMaker
