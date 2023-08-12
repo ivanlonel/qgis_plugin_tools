@@ -1,7 +1,7 @@
 """I18n tools."""
 
 from os.path import join
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 from qgis.core import QgsSettings
 from qgis.PyQt.QtCore import QFileInfo, QLocale
@@ -66,4 +66,4 @@ def tr(
     :returns: Translated version of message.
     """
     # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-    return QApplication.translate(context, text).format(*args, **kwargs)
+    return cast(str, QApplication.translate(context, text)).format(*args, **kwargs)

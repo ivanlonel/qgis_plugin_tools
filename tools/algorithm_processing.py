@@ -1,5 +1,6 @@
 """Base class algorithm."""
 from os.path import isfile
+from typing import cast
 
 from qgis.core import QgsProcessingAlgorithm
 from qgis.PyQt.QtGui import QIcon
@@ -17,7 +18,10 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
         return type(self)()
 
     def flags(self) -> QgsProcessingAlgorithm.Flags:
-        return super().flags() | QgsProcessingAlgorithm.Flag.FlagHideFromModeler
+        return cast(
+            QgsProcessingAlgorithm.Flags,
+            super().flags() | QgsProcessingAlgorithm.Flag.FlagHideFromModeler,
+        )
 
     def icon(self) -> QIcon:
         icon = resources_path("icons", "icon.png")
