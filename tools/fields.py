@@ -14,35 +14,26 @@ __revision__ = "$Format:%H$"
 
 # noinspection PyCallByClass,PyArgumentList
 def variant_type_icon(field_type: QVariant) -> QIcon:
-    if field_type == QVariant.Type.Bool:
-        return QgsApplication.getThemeIcon("/mIconFieldBool.svg")
-    if field_type in {
-        QVariant.Type.Int,
-        QVariant.Type.UInt,
-        QVariant.Type.LongLong,
-        QVariant.Type.ULongLong,
-    }:
-        return QgsApplication.getThemeIcon("/mIconFieldInteger.svg")
-    if field_type == QVariant.Type.Double:
-        return QgsApplication.getThemeIcon("/mIconFieldFloat.svg")
-    if field_type == QVariant.Type.String:
-        return QgsApplication.getThemeIcon("/mIconFieldText.svg")
-    if field_type == QVariant.Type.Date:
-        return QgsApplication.getThemeIcon("/mIconFieldDate.svg")
-    if field_type == QVariant.Type.DateTime:
-        return QgsApplication.getThemeIcon("/mIconFieldDateTime.svg")
-    if field_type == QVariant.Type.Time:
-        return QgsApplication.getThemeIcon("/mIconFieldTime.svg")
-    if field_type == QVariant.Type.ByteArray:
-        return QgsApplication.getThemeIcon("/mIconFieldBinary.svg")
-    else:
+    type_icons = {
+        QVariant.Type.Bool: "/mIconFieldBool.svg",
+        QVariant.Type.Int: "/mIconFieldInteger.svg",
+        QVariant.Type.UInt: "/mIconFieldInteger.svg",
+        QVariant.Type.LongLong: "/mIconFieldInteger.svg",
+        QVariant.Type.ULongLong: "/mIconFieldInteger.svg",
+        QVariant.Type.Double: "/mIconFieldFloat.svg",
+        QVariant.Type.String: "/mIconFieldText.svg",
+        QVariant.Type.Date: "/mIconFieldDate.svg",
+        QVariant.Type.DateTime: "/mIconFieldTime.svg",
+        QVariant.Type.Time: "/mIconFieldTime.svg",
+        QVariant.Type.ByteArray: "/mIconFieldBinary.svg",
+    }
+    file_name = type_icons.get(field_type)
+    if file_name is None:
         return QIcon()
+    return QgsApplication.getThemeIcon(file_name)
 
 
 def widget_for_field(field_type: QVariant) -> QWidget:
-    q_combo_box = QComboBox()
-    q_combo_box.setEditable(True)
-
     if field_type == QVariant.Type.Bool:
         return QCheckBox()
     if field_type in {
@@ -58,16 +49,15 @@ def widget_for_field(field_type: QVariant) -> QWidget:
         spin_box = QgsDoubleSpinBox()
         spin_box.setMaximum(2147483647)
         return spin_box
-    if field_type == QVariant.Type.String:
-        return q_combo_box
     if field_type == QVariant.Type.Date:
         return QDateEdit()
     if field_type in {QVariant.Type.DateTime, QVariant.Type.Time}:
         return QgsDateTimeEdit()
-    if field_type == QVariant.Type.ByteArray:
-        return q_combo_box
-    else:
-        return q_combo_box
+
+    # QVariant.Type.ByteArray, QVariant.Type.String or other
+    q_combo_box = QComboBox()
+    q_combo_box.setEditable(True)
+    return q_combo_box
 
 
 def value_for_widget(widget: type[QWidget]) -> Union[str, bool, float, int]:
